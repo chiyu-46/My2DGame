@@ -13,7 +13,7 @@ TagManager:
   - UI
   - Ground
   - Enviroment
-  - 
+  - NPC
   - 
   - 
   - 
@@ -49,4 +49,7 @@ TagManager:
     locked: 0
   - name: Interactable
     uniqueID: 1554880371
+    locked: 0
+  - name: NPC
+    uniqueID: 3979438481
     locked: 0
