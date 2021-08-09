@@ -41,7 +41,18 @@ public class PlayerController : MonoBehaviour
     /// <summary>
     /// 地面检测的结果。
     /// </summary>
-    private bool isGround;
+    private bool _isGround;
+    /// <summary>
+    /// 只读，返回Player是否在地上。
+    /// </summary>
+    public bool IsGround
+    {
+        get => _isGround;
+    }
+    /// <summary>
+    /// 用于Player动画控制器，Player开始跳跃时设置为true，Player动画控制器检测到后设为false。
+    /// </summary>
+    public bool StartJump { get; set; }
     
     void Start()
     {
@@ -73,7 +84,7 @@ public class PlayerController : MonoBehaviour
     /// 控制Player水平移动。
     /// </summary>
     /// <remarks>
-    ///通过Unity轴"Horizontal"获取用户输入，从而控制Player速度向量。并通过旋转方式确定Player朝向。
+    /// 通过Unity轴"Horizontal"获取用户输入，从而控制Player速度向量。并通过旋转方式确定Player朝向。
     /// </remarks>
     void Movement()
     {
@@ -99,29 +110,30 @@ public class PlayerController : MonoBehaviour
     /// 控制Player跳跃。
     /// </summary>
     /// <remarks>
-    ///获取轴"Jump"，当isGround为true时施加向上力实现跳跃。
+    /// 获取轴"Jump"，当isGround为true时施加向上力实现跳跃。
     /// </remarks>
     void Jump()
     {
         //获取跳跃轴输入。
         float jump = Input.GetAxis("Jump");
         //当player的垂直速度为零，即站在地上时，对Player施加向上力（向量）实现跳跃。
-        if (jump != 0 && isGround)
+        if (jump != 0 && _isGround)
         {
             _rb.AddForce(_jumpForceVector,ForceMode2D.Impulse);
+            StartJump = true;
         }
     }
 
     /// <summary>
     /// 检查Player是否站在地面上。
     /// <para>
-    ///并根据结果改变Player受到的重力，提高玩家在跳跃和跳下时的手感。
+    /// 并根据结果改变Player受到的重力，提高玩家在跳跃和跳下时的手感。
     /// </para>
     /// </summary>
     void GroundCheck()
     {
-        isGround = Physics2D.OverlapCircle(groundChecker.position, checkRadius, groundLayer);
-        if (isGround)
+        _isGround = Physics2D.OverlapCircle(groundChecker.position, checkRadius, groundLayer);
+        if (_isGround)
         {
             _rb.gravityScale = 1;
         }
