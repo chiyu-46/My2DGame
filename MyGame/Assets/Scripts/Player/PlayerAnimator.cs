@@ -20,6 +20,22 @@ public class PlayerAnimator : MonoBehaviour
     /// </summary>
     private Animator _animator;
     /// <summary>
+    /// 用于显示起跳特效的GameObject。
+    /// </summary>
+    public Transform jumpVFX;
+    /// <summary>
+    /// 起跳特效与Player之间的位置偏移。
+    /// </summary>
+    public Vector3 jumpOffset;
+    /// <summary>
+    /// 用于显示落地特效的GameObject。
+    /// </summary>
+    public Transform fallVFX;
+    /// <summary>
+    /// 落地特效与Player之间的位置偏移。
+    /// </summary>
+    public Vector3 fallOffset;
+    /// <summary>
     /// 动画控制参数velocity_x的id值。
     /// </summary>
     private static readonly int VelocityX = Animator.StringToHash("velocity_x");
@@ -56,5 +72,23 @@ public class PlayerAnimator : MonoBehaviour
             _playerController.StartJump = false;
         }
         _animator.SetBool(ONGround,_playerController.IsGround);
+    }
+
+    /// <summary>
+    /// 显示起跳特效。由动画事件调用。
+    /// </summary>
+    public void ShowJumpVFX()
+    {
+        jumpVFX.gameObject.SetActive(true);
+        jumpVFX.position = transform.position + jumpOffset;
+    }
+
+    /// <summary>
+    /// 显示落地特效。由动画事件调用。
+    /// </summary>
+    public void ShowFallVFX()
+    {
+        fallVFX.gameObject.SetActive(true);
+        fallVFX.position = transform.position + fallOffset;
     }
 }
