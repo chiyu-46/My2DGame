@@ -14,8 +14,15 @@ public class PlayerController : MonoBehaviour, IWoundable
     private int health;
     [SerializeField] 
     private int defense;
+    [SerializeField] 
+    private int maxHealth;
     /// <inheritdoc />
-    public int Health { get => health; set => health = value; }
+    public int Health
+    {
+        get => health;
+        set { health = value > maxHealth ? maxHealth : value; }
+    }
+
     /// <inheritdoc />
     public int Defense { get => defense; set => defense = value; }
     
@@ -222,7 +229,7 @@ public class PlayerController : MonoBehaviour, IWoundable
         if (_usableList.Count > 0)
         {
             //TODO:选择要使用的物品。
-            _usableList[0].Use();
+            _usableList[0].Use(gameObject);
         }
     }
 
@@ -237,7 +244,7 @@ public class PlayerController : MonoBehaviour, IWoundable
         {
             if (item.GetGameObject().CompareTag("Cannon"))
             {
-                item.SpecialUse();
+                item.SpecialUse(gameObject);
             }
         }
         

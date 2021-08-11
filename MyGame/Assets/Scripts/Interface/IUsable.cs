@@ -26,10 +26,12 @@ public interface IUsable
     /// <summary>
     /// 对象被使用时执行。
     /// </summary>
-    void Use();
+    /// <param name="user">使用此物品的用户。</param>
+    void Use(GameObject user);
 
     /// <summary>
     /// 物品的特殊用法，例如大炮可以转向。
     /// </summary>
-    void SpecialUse();
+    /// <param name="user">使用此物品的用户。</param>
+    void SpecialUse(GameObject user);
 }

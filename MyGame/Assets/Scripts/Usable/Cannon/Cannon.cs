@@ -77,7 +77,7 @@ public class Cannon : MonoBehaviour, IUsable
     /// <summary>
     /// 使用大炮开炮。
     /// </summary>
-    public void Use()
+    public void Use(GameObject user)
     {
         if (LastTime + CoolingTime < Time.time)
         {
@@ -89,7 +89,7 @@ public class Cannon : MonoBehaviour, IUsable
     /// <summary>
     /// 大炮转向。
     /// </summary>
-    public void SpecialUse()
+    public void SpecialUse(GameObject user)
     {
         transform.Rotate(0,180,0);
     }
