@@ -248,6 +248,38 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: 50a2534e-0c1d-4afc-afde-ca46733ebe6a
     m_ActionName: Player/Attack[/Keyboard/j]
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 4534596171405235416}
+        m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
+        m_MethodName: Use
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 036c67f9-29f5-434a-8db8-025cc233b70a
+    m_ActionName: Player/Use[/Keyboard/f]
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 4534596171405235416}
+        m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
+        m_MethodName: SpecialUse
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: f6414523-babd-47d7-ac5d-5daf6232063f
+    m_ActionName: Player/SpecialUse[/Keyboard/r]
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: Keyboard
   m_DefaultActionMap: Player
@@ -265,6 +297,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6a0c9c710caf12442b16bdaaa345a3e7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  health: 3
+  defense: 0
   jumpForce: 5
   speed: 4
   groundChecker: {fileID: 4534596170629330896}

@@ -1,18 +1,35 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class IUsable : MonoBehaviour
+/// <summary>
+/// 所有能够被使用的对象应实现此接口。
+/// </summary>
+public interface IUsable
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    /// <summary>
+    /// 最后一次被使用的时间。
+    /// </summary>
+    /// <remarks>
+    /// 初次使用为场景加载时间。
+    /// </remarks>
+    float LastTime { get; set; }
+    /// <summary>
+    /// 使用冷却时间。
+    /// </summary>
+    float CoolingTime { get; set; }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    /// <summary>
+    /// 获取挂载实现本接口的脚本的游戏对象。
+    /// </summary>
+    /// <returns>当前脚本对应的游戏对象。</returns>
+    GameObject GetGameObject();
+
+    /// <summary>
+    /// 对象被使用时执行。
+    /// </summary>
+    void Use();
+
+    /// <summary>
+    /// 物品的特殊用法，例如大炮可以转向。
+    /// </summary>
+    void SpecialUse();
 }

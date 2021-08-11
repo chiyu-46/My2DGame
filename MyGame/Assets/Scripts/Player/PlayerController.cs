@@ -7,8 +7,18 @@ using UnityEngine.InputSystem;
 /// <summary>
 /// 此类是Player游戏对象的控制器。
 /// </summary>
-public class PlayerController : MonoBehaviour
+public class PlayerController : MonoBehaviour, IWoundable
 {
+    
+    [Header("Base")][SerializeField] 
+    private int health;
+    [SerializeField] 
+    private int defense;
+    /// <inheritdoc />
+    public int Health { get => health; set => health = value; }
+    /// <inheritdoc />
+    public int Defense { get => defense; set => defense = value; }
+    
     /// <summary>
     /// Player的刚体组件。
     /// </summary>
@@ -24,6 +34,7 @@ public class PlayerController : MonoBehaviour
     /// <summary>
     /// Player跳跃时收到的向上的力的值。
     /// </summary>
+    [Header("Movement")]
     public float jumpForce;
     /// <summary>
     /// Player跳跃时收到的向上的力的向量。
@@ -59,7 +70,12 @@ public class PlayerController : MonoBehaviour
     /// 用于Player动画控制器，Player开始跳跃时设置为true，Player动画控制器检测到后设为false。
     /// </summary>
     public bool StartJump { get; set; }
-    
+
+    /// <summary>
+    /// 存储当前位置所有可使用物体。
+    /// </summary>
+    private List<IUsable> _usableList = new List<IUsable>();
+
     void Start()
     {
         //获取刚体组件。
@@ -70,11 +86,6 @@ public class PlayerController : MonoBehaviour
         _movementAction = _playerInput.actions["Movement"];
         //将跳跃力的值变成跳跃力向量。
         _jumpForceVector = Vector2.up * jumpForce;
-    }
-    
-    void Update()
-    {
-        
     }
 
     /// <summary>
@@ -151,5 +162,84 @@ public class PlayerController : MonoBehaviour
         {
             _rb.gravityScale = 4;
         }
+    }
+
+    /// <inheritdoc />
+    public void GetHit(int damage)
+    {
+        //TODO:播放受伤动画。
+        //如果防御力大于受到伤害，则不受伤害。
+        int real = damage - Defense;
+        if (real <= 0)
+        {
+            return;
+        }
+        //受到伤害。
+        Health = Health - real;
+        //如果此次受伤导致死亡，将调用Dead方法。
+        if (Health <= 0)
+        {
+            //TODO:避免再次受到伤害。
+            Health = 0;
+            Dead();
+        }
+    }
+
+    /// <inheritdoc />
+    public void Dead()
+    {
+        //TODO:显示死亡动画。
+    }
+
+    /// <summary>
+    /// 当Player进入可被使用物品的触发器后，由物品调用，将自己置于player当前可使用列表中。
+    /// </summary>
+    /// <param name="usable">Player碰到的可被使用物品</param>
+    public void Register(IUsable usable)
+    {
+        if (!_usableList.Contains(usable))
+        {
+            _usableList.Add(usable);
+        }
+    }
+    
+    /// <summary>
+    /// 当Player走出可被使用物品的触发器后，由物品调用，将自己移出player当前可使用列表中。
+    /// </summary>
+    /// <param name="usable">Player碰到的可被使用物品</param>
+    public void Remove(IUsable usable)
+    {
+        if (_usableList.Contains(usable))
+        {
+            _usableList.Remove(usable);
+        }
+    }
+    /// <summary>
+    /// 由InputSystem调用，控制使用可使用物品。
+    /// </summary>
+    public void Use()
+    {
+        if (_usableList.Count > 0)
+        {
+            //TODO:选择要使用的物品。
+            _usableList[0].Use();
+        }
+    }
+
+    /// <summary>
+    /// 由InputSystem调用，控制使用可使用物品的特殊用法。
+    /// </summary>
+    public void SpecialUse()
+    {
+        //TODO:控制UI按钮是否显示。
+        //TODO:可能存在其他有特殊用法的物品。
+        foreach (var item in _usableList)
+        {
+            if (item.GetGameObject().CompareTag("Cannon"))
+            {
+                item.SpecialUse();
+            }
+        }
+        
     }
 }

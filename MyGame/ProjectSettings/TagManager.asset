@@ -3,7 +3,11 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - Cannon
+  - Heart
+  - Door
+  - Enemy
   layers:
   - Default
   - TransparentFX
@@ -18,8 +22,8 @@ TagManager:
   - VFX
   - Player
   - Usable
-  - 
-  - 
+  - TriggersForPlayer
+  - CannonBall
   - 
   - 
   - 
