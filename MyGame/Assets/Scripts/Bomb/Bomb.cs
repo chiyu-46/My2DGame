@@ -6,7 +6,7 @@ using UnityEngine;
 /// <summary>
 /// 此类用于控制炸弹。
 /// </summary>
-public class Bomb : MonoBehaviour
+public class Bomb : MonoBehaviour, IPoolAble
 {
     /// <summary>
     /// 炸弹被扔下的时间。
@@ -36,7 +36,11 @@ public class Bomb : MonoBehaviour
     /// 炸弹Animator的Trigger“explosion”的id。
     /// </summary>
     private static readonly int Explosion = Animator.StringToHash("explosion");
-
+    /// <summary>
+    /// 自己是否已经被回收到对象池。
+    /// </summary>
+    public bool IsRecycled { get; set; }
+    
     void Start()
     {
         _animator = GetComponent<Animator>();
@@ -68,6 +72,8 @@ public class Bomb : MonoBehaviour
     /// </summary>
     public void Explode()
     {
+        //重置游戏对象的旋转状态，使爆炸效果始终朝向正确。
+        transform.rotation = Quaternion.Euler(0,0,0);
         Collider2D[] aroundObjects = Physics2D.OverlapCircleAll(transform.position, explosionRadius,targetLayer);
         foreach (var item in aroundObjects)
         {
@@ -79,10 +85,10 @@ public class Bomb : MonoBehaviour
     /// <summary>
     /// 炸弹爆炸后将自己归还炸弹对象池。由动画事件调用。
     /// </summary>
-    public void Exploded()
+    public void OnRecycled()
     {
         GameObject me = gameObject;
         gameObject.SetActive(false);
-        transform.parent.GetComponent<BombPool>().ReturnBomb(ref me);
+        transform.parent.GetComponent<BombPool>().Recycle(ref me);
     }
 }

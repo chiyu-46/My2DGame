@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7050031307998535087}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Cannon Ball Pos
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -44,7 +44,7 @@ GameObject:
   - component: {fileID: 8563281148854929113}
   - component: {fileID: 8563281148854929094}
   - component: {fileID: 2708773868004004376}
-  m_Layer: 7
+  m_Layer: 12
   m_Name: Cannon
   m_TagString: Untagged
   m_Icon: {fileID: 0}

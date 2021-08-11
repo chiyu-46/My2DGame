@@ -34,7 +34,7 @@ public class PlayerAttack : MonoBehaviour
         if (_lastTime + coolingTime <= Time.time)
         {
             GameObject bomb;
-            bombPool.GetBomb(out bomb);
+            bombPool.Allocate(out bomb);
             bomb.SetActive(true);
             bomb.transform.position = transform.position;
             _lastTime = Time.time;

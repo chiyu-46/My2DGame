@@ -44,4 +44,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   waterLine: 5
-  bombPrefab: {fileID: 8866530345644645398, guid: 2ff69ecf9ac81c148808b73ae1fc945f, type: 3}
+  prefab: {fileID: 8866530345644645398, guid: 2ff69ecf9ac81c148808b73ae1fc945f, type: 3}
