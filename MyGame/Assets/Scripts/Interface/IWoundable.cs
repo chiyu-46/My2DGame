@@ -13,6 +13,11 @@ public interface IWoundable
     int Defense { get; set; }
     
     /// <summary>
+    /// 此对象能否被攻击。用于实现对象无敌状态。
+    /// </summary>
+    bool CanGetHit { get; set; }
+    
+    /// <summary>
     /// 受到伤害。
     /// </summary>
     /// <param name="damage">受到的伤害值。</param>

@@ -17,6 +17,9 @@ public class Cannon : MonoBehaviour, IUsable
     public float LastTime { get; set; }
     /// <inheritdoc />
     public float CoolingTime { get => _coolTime; set => _coolTime = value; }
+    /// <inheritdoc />
+    public bool CanUse { get; set; }
+
     /// <summary>
     /// 大炮的动画器。
     /// </summary>

@@ -16,6 +16,10 @@ public interface IUsable
     /// 使用冷却时间。
     /// </summary>
     float CoolingTime { get; set; }
+    /// <summary>
+    /// 物品能不能被使用。适用于一次性使用或者不根据冷却时间确定能不能使用的场景。
+    /// </summary>
+    bool CanUse { get; set; }
 
     /// <summary>
     /// 获取挂载实现本接口的脚本的游戏对象。

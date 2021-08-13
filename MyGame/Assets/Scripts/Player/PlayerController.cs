@@ -9,6 +9,28 @@ using UnityEngine.InputSystem;
 /// </summary>
 public class PlayerController : MonoBehaviour, IWoundable
 {
+    /// <summary>
+    /// 玩家使用门时的不同状态。
+    /// </summary>
+    public enum UseDoorState
+    {
+        /// <summary>
+        /// 玩家开始进门。
+        /// </summary>
+        UseDoor,
+        /// <summary>
+        /// 玩家在门中。
+        /// </summary>
+        InDoor,
+        /// <summary>
+        /// 玩家走出门。
+        /// </summary>
+        OutDoor,
+        /// <summary>
+        /// 玩家没有使用门。
+        /// </summary>
+        UnUseDoor
+    }
     
     [Header("Base")][SerializeField] 
     private int health;
@@ -83,6 +105,21 @@ public class PlayerController : MonoBehaviour, IWoundable
     /// </summary>
     private List<IUsable> _usableList = new List<IUsable>();
 
+    /// <inheritdoc />
+    public bool CanGetHit { get; set; }
+
+    /// <summary>
+    /// 玩家当前能不能移动。
+    /// </summary>
+    /// <remarks>
+    /// 用于处理禁锢技能或进出门时不能移动的功能。
+    /// </remarks>
+    public bool canMove;
+    /// <summary>
+    /// 用于确定Player当前处于使用门的哪个阶段。
+    /// </summary>
+    public int currentUseDoorState;
+    
     void Start()
     {
         //获取刚体组件。
@@ -93,6 +130,8 @@ public class PlayerController : MonoBehaviour, IWoundable
         _movementAction = _playerInput.actions["Movement"];
         //将跳跃力的值变成跳跃力向量。
         _jumpForceVector = Vector2.up * jumpForce;
+        canMove = true;
+        currentUseDoorState = (int)UseDoorState.UnUseDoor;
     }
 
     /// <summary>
@@ -112,21 +151,24 @@ public class PlayerController : MonoBehaviour, IWoundable
     /// </remarks>
     private void Movement()
     {
-        //获取水平轴输入。
-        float horizontalInput = _movementAction.ReadValue<float>();
-        //确定Player速度（向量）。
-        _rb.velocity = new Vector2(horizontalInput * speed, _rb.velocity.y);
-        if (horizontalInput != 0)
+        if (canMove)
         {
-            //根据运动方向确定Player朝向。
-            if (horizontalInput > 0 )
-            { 
-                transform.rotation = Quaternion.Euler(0,0,0);
-            }
-            else
+            //获取水平轴输入。
+            float horizontalInput = _movementAction.ReadValue<float>();
+            //确定Player速度（向量）。
+            _rb.velocity = new Vector2(horizontalInput * speed, _rb.velocity.y);
+            if (horizontalInput != 0)
             {
-                transform.rotation = Quaternion.Euler(0,180,0);
-            }
+                //根据运动方向确定Player朝向。
+                if (horizontalInput > 0 )
+                { 
+                    transform.rotation = Quaternion.Euler(0,0,0);
+                }
+                else
+                {
+                    transform.rotation = Quaternion.Euler(0,180,0);
+                }
+            }  
         }
     }
     
@@ -144,11 +186,14 @@ public class PlayerController : MonoBehaviour, IWoundable
     /// </remarks>
     public void Jump()
     {
-        //当player的垂直速度为零，即站在地上时，对Player施加向上力（向量）实现跳跃。
-        if (_isGround)
+        if (canMove)
         {
-            _rb.AddForce(_jumpForceVector,ForceMode2D.Impulse);
-            StartJump = true;
+            //当player的垂直速度为零，即站在地上时，对Player施加向上力（向量）实现跳跃。
+            if (_isGround)
+            {
+                _rb.AddForce(_jumpForceVector,ForceMode2D.Impulse);
+                StartJump = true;
+            }
         }
     }
 
@@ -196,6 +241,7 @@ public class PlayerController : MonoBehaviour, IWoundable
     public void Dead()
     {
         //TODO:显示死亡动画。
+        canMove = false;
     }
 
     /// <summary>
@@ -247,6 +293,34 @@ public class PlayerController : MonoBehaviour, IWoundable
                 item.SpecialUse(gameObject);
             }
         }
-        
+    }
+
+    /// <summary>
+    /// Player进门动画播放完成，即完成进门动作，执行转移时由动画系统调用。
+    /// </summary>
+    public void InDoor()
+    {
+        transform.position = _usableList[0].GetGameObject().GetComponent<Door>().target.transform.position;
+        currentUseDoorState = (int)UseDoorState.InDoor;
+        CanGetHit = false;
+    }
+    
+    /// <summary>
+    /// Player出门动画播放时，即从门中走出，执行使玩家可被攻击，由动画系统调用。
+    /// </summary>
+    public void OutDoor()
+    {
+        CanGetHit = true;
+        currentUseDoorState = (int)UseDoorState.OutDoor;
+    }
+    
+    /// <summary>
+    /// Player完全出门时，执行使玩家可移动，由动画系统调用。
+    /// </summary>
+    public void FinishOutDoor()
+    {
+        canMove = true;
+        currentUseDoorState = (int)UseDoorState.UnUseDoor;
     }
 }
+
