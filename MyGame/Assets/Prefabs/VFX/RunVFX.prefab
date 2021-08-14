@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 6465722740341516117}
   - component: {fileID: 6465722740341516116}
   - component: {fileID: -995508738890408590}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: RunVFX
   m_TagString: Untagged
   m_Icon: {fileID: 0}

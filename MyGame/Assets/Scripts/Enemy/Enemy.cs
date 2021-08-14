@@ -6,8 +6,10 @@ using FSM;
 using UnityEngine.PlayerLoop;
 using Random = UnityEngine.Random;
 
-public class Enemy : BaseFSM<Enemy>, IWoundable
+public class Enemy : BaseFSM, IWoundable
 {
+    #region 基础部分
+    
     /// <summary>
     /// 生命值。用于从Unity显式获取值。
     /// </summary>
@@ -24,6 +26,11 @@ public class Enemy : BaseFSM<Enemy>, IWoundable
     public int Defense { get => defense; set => defense = value; }
     /// <inheritdoc />
     public bool CanGetHit { get; set; }
+
+    #endregion
+
+    #region 组件
+    
     /// <summary>
     /// 当前敌人的Animator。
     /// </summary>
@@ -32,6 +39,11 @@ public class Enemy : BaseFSM<Enemy>, IWoundable
     /// 当前敌人的Rigidbody2D。
     /// </summary>
     private Rigidbody2D _rb;
+    
+    #endregion
+    
+    #region 状态机转换需要的参数
+
     /// <summary>
     /// 是否发现玩家。
     /// </summary>
@@ -41,21 +53,18 @@ public class Enemy : BaseFSM<Enemy>, IWoundable
     /// </summary>
     private bool _findBomb = false;
     /// <summary>
+    /// 是否被攻击。
+    /// </summary>
+    private bool _gitHit = false;
+    /// <summary>
     /// 是否已经死亡。
     /// </summary>
     private bool _dead = false;
-    /// <summary>
-    /// 获取是否处于发现玩家状态。
-    /// </summary>
-    public bool FindPlayer { get => _findPlayer; }
-    /// <summary>
-    /// 获取是否处于发现炸弹状态。
-    /// </summary>
-    public bool FindBomb { get => _findBomb; }
-    /// <summary>
-    /// 获取是否处于已经死亡状态。
-    /// </summary>
-    public bool Dead1 { get => _dead; }
+
+    #endregion
+
+    #region 巡逻点
+
     /// <summary>
     /// 路径点的触发器所在layer。
     /// </summary>
@@ -73,18 +82,37 @@ public class Enemy : BaseFSM<Enemy>, IWoundable
     /// 
     /// </summary>
     protected Vector2 CurrentPoint;
+
+    #endregion
+
+    #region 运动参数。
+
     /// <summary>
     /// 敌人的速度。
     /// </summary>
     [SerializeField][Header("Movement")]
     protected float Speed;
     /// <summary>
+    /// 敌人的弹跳力。
+    /// </summary>
+    [SerializeField]
+    protected float JumpForce;
+    /// <summary>
+    /// 用于Player动画控制器，Player开始跳跃时设置为true，Player动画控制器检测到后设为false。
+    /// </summary>
+    public bool StartJump { get; set; }
+
+    #endregion
+
+    #region 巡逻状态参数
+
+    /// <summary>
     /// 敌人在巡逻状态下，到达路径点后停顿的时间。
     /// </summary>
     [SerializeField]
     protected float PatrolIdleTime;
     /// <summary>
-    /// 敌人追击玩家时丢失目标后，发呆的时间。
+    /// 敌人丢失目标后，发呆的时间。
     /// </summary>
     [SerializeField]
     protected float LostIdleTime;
@@ -92,11 +120,11 @@ public class Enemy : BaseFSM<Enemy>, IWoundable
     /// 敌人到达巡逻路径点的时间。
     /// </summary>
     protected float ReachTime;
-    /// <summary>
-    /// 敌人的弹跳力。
-    /// </summary>
-    [SerializeField]
-    protected float JumpForce;
+
+    #endregion
+    
+    #region 动画触发器
+
     /// <summary>
     /// Animator触发器Velocity_x的id。
     /// </summary>
@@ -109,6 +137,10 @@ public class Enemy : BaseFSM<Enemy>, IWoundable
     /// 动画控制参数onGround的id值。
     /// </summary>
     private static readonly int ONGround = Animator.StringToHash("OnGround");
+
+    #endregion
+
+    #region 地面检测
 
     /// <summary>
     /// 位于Player脚下的点的引用。以此为中心检测脚下是否有地面。
@@ -131,21 +163,47 @@ public class Enemy : BaseFSM<Enemy>, IWoundable
     /// 只读，返回Player是否在地上。
     /// </summary>
     public bool IsGround { get => _isGround; }
-    /// <summary>
-    /// 用于Player动画控制器，Player开始跳跃时设置为true，Player动画控制器检测到后设为false。
-    /// </summary>
-    public bool StartJump { get; set; }
+
+    #endregion
     
-    private void Awake()
+    
+    
+    public override void Awake()
     {
+        base.Awake();
         _animator = GetComponent<Animator>();
         _rb = GetComponent<Rigidbody2D>();
         Route = new List<Vector2>();
-        AllStates.Add("Patrol",new FSMState<Enemy>("Patrol"));
-        AllStates.Add("FindPlayer",new FSMState<Enemy>("FindPlayer"));
-        AllStates.Add("FindBomb",new FSMState<Enemy>("FindBomb"));
-        AllStates.Add("Dead",new FSMState<Enemy>("Dead"));
-        CurrentState = AllStates["Patrol"];
+        //添加状态。
+        AllStates.Add("Patrol",new FSMState("Patrol"));
+        AllStates.Add("FindPlayer",new FSMState("FindPlayer"));
+        AllStates.Add("FindBomb",new FSMState("FindBomb"));
+        AllStates.Add("GitHit",new FSMState("GitHit"));
+        AllStates.Add("Dead",new FSMState("Dead"));
+        //添加转换条件。
+        List<FSMTranslation> tempStateTranslations;
+        //无条件从默认开始状态转移到真正的默认状态。
+        AllStates["Start"].FsmTranslations.Add(new FSMTranslation("Patrol",null));
+        //巡逻状态转换其他状态条件。
+        tempStateTranslations = AllStates["Patrol"].FsmTranslations;
+        tempStateTranslations.Add(new FSMTranslation("FindPlayer",(() => _findPlayer)));
+        tempStateTranslations.Add(new FSMTranslation("FindBomb",() => _findBomb));
+        tempStateTranslations.Add(new FSMTranslation("GitHit",() => _gitHit));
+        //发现玩家状态转换其他状态条件。
+        //发现炸弹的优先级比发现玩家高。
+        tempStateTranslations = AllStates["FindPlayer"].FsmTranslations;
+        tempStateTranslations.Add(new FSMTranslation("Patrol",(() => _findPlayer == false)));
+        tempStateTranslations.Add(new FSMTranslation("FindBomb",(() => _findBomb)));
+        tempStateTranslations.Add(new FSMTranslation("GitHit",(() => _gitHit)));
+        //发现炸弹状态转换其他状态条件。
+        tempStateTranslations = AllStates["FindBomb"].FsmTranslations;
+        tempStateTranslations.Add(new FSMTranslation("Patrol",(() => _findBomb == false)));
+        tempStateTranslations.Add(new FSMTranslation("GitHit",(() => _gitHit)));
+        //受伤状态后将进入巡逻状态。
+        tempStateTranslations = AllStates["FindBomb"].FsmTranslations;
+        tempStateTranslations.Add(new FSMTranslation("Patrol",null));
+        tempStateTranslations.Add(new FSMTranslation("Dead",(() => _dead)));
+        //当敌人死亡后，状态机将停留在死亡状态，不能向其他状态转换，所以不添加转换条件。
     }
 
     private void Start()

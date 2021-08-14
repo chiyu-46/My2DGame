@@ -21,6 +21,10 @@ public class Bomb : MonoBehaviour, IPoolAble
     /// </summary>
     private Animator _animator;
     /// <summary>
+    /// 炸弹的刚体。
+    /// </summary>
+    private Rigidbody2D _rigidbody;
+    /// <summary>
     /// 炸弹的爆炸范围。
     /// </summary>
     public float explosionRadius;
@@ -44,6 +48,7 @@ public class Bomb : MonoBehaviour, IPoolAble
     void Start()
     {
         _animator = GetComponent<Animator>();
+        _rigidbody = GetComponent<Rigidbody2D>();
     }
 
     private void OnEnable()
@@ -72,8 +77,9 @@ public class Bomb : MonoBehaviour, IPoolAble
     /// </summary>
     public void Explode()
     {
-        //重置游戏对象的旋转状态，使爆炸效果始终朝向正确。
+        //重置游戏对象的旋转状态并锁定，使爆炸效果始终朝向正确。
         transform.rotation = Quaternion.Euler(0,0,0);
+        _rigidbody.constraints = RigidbodyConstraints2D.FreezeRotation;
         Collider2D[] aroundObjects = Physics2D.OverlapCircleAll(transform.position, explosionRadius,targetLayer);
         foreach (var item in aroundObjects)
         {
@@ -87,6 +93,7 @@ public class Bomb : MonoBehaviour, IPoolAble
     /// </summary>
     public void OnRecycled()
     {
+        _rigidbody.constraints = RigidbodyConstraints2D.None;
         GameObject me = gameObject;
         gameObject.SetActive(false);
         transform.parent.GetComponent<BombPool>().Recycle(ref me);

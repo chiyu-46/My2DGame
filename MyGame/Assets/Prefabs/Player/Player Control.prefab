@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4534596170629330896}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: CheckGround
   m_TagString: Untagged
   m_Icon: {fileID: 7174288486110832750, guid: 0000000000000000d000000000000000, type: 0}
@@ -307,6 +307,8 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 64
+  canMove: 0
+  currentUseDoorState: 0
 --- !u!114 &4534596171405235418
 MonoBehaviour:
   m_ObjectHideFlags: 0
