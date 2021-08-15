@@ -160,3 +160,4 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 384
   bombForce: 5
+  attack: 1

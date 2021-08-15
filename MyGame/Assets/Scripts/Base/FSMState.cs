@@ -17,6 +17,9 @@ namespace FSM
         /// <summary>
         /// 此状态向其他状态转换的所有转换关系列表。
         /// </summary>
+        /// <remarks>
+        /// 序号越靠前，权重越大。
+        /// </remarks>
         public List<FSMTranslation> FsmTranslations;
         /// <summary>
         /// 在进入此状态时应当执行的所有方法。

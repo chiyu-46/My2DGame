@@ -55,7 +55,8 @@ public class Enemy : BaseFSM, IWoundable
     /// <summary>
     /// 是否被攻击。
     /// </summary>
-    private bool _gitHit = false;
+    private bool _getHit = false;
+    private bool _getHitAnimationFinished = false;
     /// <summary>
     /// 是否已经死亡。
     /// </summary>
@@ -137,6 +138,14 @@ public class Enemy : BaseFSM, IWoundable
     /// 动画控制参数onGround的id值。
     /// </summary>
     private static readonly int ONGround = Animator.StringToHash("OnGround");
+    /// <summary>
+    /// 动画控制参数Dead的id值。
+    /// </summary>
+    private static readonly int DeadId = Animator.StringToHash("Dead");
+    /// <summary>
+    /// 动画控制参数GetHit的id值。
+    /// </summary>
+    private static readonly int GETHitId = Animator.StringToHash("GetHit");
 
     #endregion
 
@@ -159,6 +168,7 @@ public class Enemy : BaseFSM, IWoundable
     /// 地面检测的结果。
     /// </summary>
     private bool _isGround;
+
     /// <summary>
     /// 只读，返回Player是否在地上。
     /// </summary>
@@ -174,56 +184,49 @@ public class Enemy : BaseFSM, IWoundable
         _animator = GetComponent<Animator>();
         _rb = GetComponent<Rigidbody2D>();
         Route = new List<Vector2>();
+        CanGetHit = true;
         //添加状态。
         AllStates.Add("Patrol",new FSMState("Patrol"));
         AllStates.Add("FindPlayer",new FSMState("FindPlayer"));
         AllStates.Add("FindBomb",new FSMState("FindBomb"));
         AllStates.Add("GitHit",new FSMState("GitHit"));
         AllStates.Add("Dead",new FSMState("Dead"));
+        //添加每个状态要执行的内容。
+        FSMState tempState;
+        tempState = AllStates["Patrol"];
+        tempState.OnStateEnter += OnPatrolStateEnter;
+        tempState.OnStateStay += OnPatrolStateStay;
+        tempState = AllStates["FindPlayer"];
+        tempState = AllStates["FindBomb"];
+        tempState = AllStates["GitHit"];
+        tempState.OnStateStay += StartGitHitAnimation;
+        tempState.OnStateExit += GetHitStateExit;
+        tempState = AllStates["Dead"];
+        tempState.OnStateStay += Dead;
         //添加转换条件。
         List<FSMTranslation> tempStateTranslations;
         //无条件从默认开始状态转移到真正的默认状态。
         AllStates["Start"].FsmTranslations.Add(new FSMTranslation("Patrol",null));
         //巡逻状态转换其他状态条件。
         tempStateTranslations = AllStates["Patrol"].FsmTranslations;
-        tempStateTranslations.Add(new FSMTranslation("FindPlayer",(() => _findPlayer)));
+        tempStateTranslations.Add(new FSMTranslation("GitHit",() => _getHit));
         tempStateTranslations.Add(new FSMTranslation("FindBomb",() => _findBomb));
-        tempStateTranslations.Add(new FSMTranslation("GitHit",() => _gitHit));
+        tempStateTranslations.Add(new FSMTranslation("FindPlayer",(() => _findPlayer)));
         //发现玩家状态转换其他状态条件。
         //发现炸弹的优先级比发现玩家高。
         tempStateTranslations = AllStates["FindPlayer"].FsmTranslations;
-        tempStateTranslations.Add(new FSMTranslation("Patrol",(() => _findPlayer == false)));
+        tempStateTranslations.Add(new FSMTranslation("GitHit",(() => _getHit)));
         tempStateTranslations.Add(new FSMTranslation("FindBomb",(() => _findBomb)));
-        tempStateTranslations.Add(new FSMTranslation("GitHit",(() => _gitHit)));
+        tempStateTranslations.Add(new FSMTranslation("Patrol",(() => _findPlayer == false)));
         //发现炸弹状态转换其他状态条件。
         tempStateTranslations = AllStates["FindBomb"].FsmTranslations;
+        tempStateTranslations.Add(new FSMTranslation("GitHit",(() => _getHit)));
         tempStateTranslations.Add(new FSMTranslation("Patrol",(() => _findBomb == false)));
-        tempStateTranslations.Add(new FSMTranslation("GitHit",(() => _gitHit)));
         //受伤状态后将进入巡逻状态。
-        tempStateTranslations = AllStates["FindBomb"].FsmTranslations;
-        tempStateTranslations.Add(new FSMTranslation("Patrol",null));
+        tempStateTranslations = AllStates["GitHit"].FsmTranslations;
         tempStateTranslations.Add(new FSMTranslation("Dead",(() => _dead)));
+        tempStateTranslations.Add(new FSMTranslation("Patrol", () => _getHitAnimationFinished));
         //当敌人死亡后，状态机将停留在死亡状态，不能向其他状态转换，所以不添加转换条件。
-    }
-
-    private void Start()
-    {
-        GetRoute();
-        ReachTime = Time.time;
-        CurrentRouteId = 0;
-    }
-
-    public override void Update()
-    {
-        base.Update();
-
-        //TODO:状态转换时执行某些方法。
-        switch (CurrentState.stateName)
-        {
-            case "Patrol":
-                PatrolMove();
-                break;
-        }
     }
 
     private void FixedUpdate()
@@ -234,6 +237,22 @@ public class Enemy : BaseFSM, IWoundable
         _animator.SetFloat(VelocityY,_rb.velocity.y);
     }
 
+    /// <summary>
+    /// 在巡逻状态进入时执行。
+    /// </summary>
+    private void OnPatrolStateEnter()
+    {
+        ResetRoute();
+    }
+    
+    /// <summary>
+    /// 在巡逻状态进入时执行。
+    /// </summary>
+    private void OnPatrolStateStay()
+    {
+        PatrolMove();
+    }
+    
     /// <summary>
     /// 在巡逻时，根据目标点与自己的位置确定当前应当的朝向。
     /// </summary>
@@ -264,7 +283,6 @@ public class Enemy : BaseFSM, IWoundable
             {
                 _rb.velocity = new Vector2(-Speed, _rb.velocity.y);
             }
-            transform.position = Vector2.MoveTowards(transform.position, GetCurrentPatrolPoint(), Speed * Time.deltaTime);
             if (Vector2.Distance(GetCurrentPatrolPoint(),transform.position) <= 0.1)
             {
                 _rb.velocity = new Vector2(0, _rb.velocity.y);
@@ -281,11 +299,24 @@ public class Enemy : BaseFSM, IWoundable
     {
         Route.Clear();
         Collider2D[] routes = Physics2D.OverlapCircleAll(transform.position, .5f, routeLayerMask);
-        List<float> routesX= routes[Random.Range(0,routes.Length)].GetComponent<Route>().GetRoute();
-        for (int i = 0; i < routesX.Count; i++)
+        if (routes.Length != 0)
         {
-            Route.Add(new Vector2(routesX[i],transform.position.y));
+            List<float> routesX= routes[Random.Range(0,routes.Length)].GetComponent<Route>().GetRoute();
+            for (int i = 0; i < routesX.Count; i++)
+            {
+                Route.Add(new Vector2(routesX[i],transform.position.y));
+            }
         }
+    }
+
+    /// <summary>
+    /// 重置巡逻路径。
+    /// </summary>
+    private void ResetRoute()
+    {
+        GetRoute();
+        ReachTime = Time.time;
+        CurrentRouteId = 0;
     }
     
     /// <summary>
@@ -307,9 +338,9 @@ public class Enemy : BaseFSM, IWoundable
     }
     
     /// <summary>
-    /// 检查Player是否站在地面上。
+    /// 检查Enemy是否站在地面上。
     /// <para>
-    /// 并根据结果改变Player受到的重力，提高玩家在跳跃和跳下时的手感。
+    /// 并根据结果改变Enemy受到的重力，提高玩家在跳跃和跳下时的手感。
     /// </para>
     /// </summary>
     void GroundCheck()
@@ -328,28 +359,64 @@ public class Enemy : BaseFSM, IWoundable
     /// <inheritdoc />
     public void GetHit(int damage)
     {
-        //TODO:播放受伤动画。
-        //如果防御力大于受到伤害，则不受伤害。
-        int real = damage - Defense;
-        if (real <= 0)
+        if (CanGetHit)
         {
-            return;
-        }
-        //受到伤害。
-        Health = Health - real;
-        //如果此次受伤导致死亡，将调用Dead方法。
-        if (Health <= 0)
-        {
-            //TODO:避免再次受到伤害。
-            Health = 0;
-            Dead();
+            //如果防御力大于受到伤害，则不受伤害。
+            int real = damage - Defense;
+            if (real <= 0)
+            {
+                return;
+            }
+            //受到伤害。
+            _getHit = true;
+            CanGetHit = false;
+            Health = Health - real;
+            //如果此次受伤导致死亡，将标记为已死亡。
+            if (Health <= 0)
+            {
+                //TODO:避免再次受到伤害。
+                Health = 0;
+                _dead = true;
+            }
         }
     }
 
+    /// <summary>
+    /// 播放受伤动画。保持在受伤状态时执行。
+    /// </summary>
+    public void StartGitHitAnimation()
+    {
+        if (_getHit)
+        {
+            _animator.SetTrigger(GETHitId);
+            _getHit = false;
+        }
+    }
+
+    /// <summary>
+    /// 受伤动画播放完成。动画系统调用。
+    /// </summary>
+    public void GitHitAnimationFinished()
+    {
+        _getHitAnimationFinished = true;
+    }
+
+    /// <summary>
+    /// 在Enemy受伤状态结束后时执行。
+    /// </summary>
+    public void GetHitStateExit()
+    {
+        _getHit = false;
+        _getHitAnimationFinished = false;
+        if (!_dead)
+        {
+            CanGetHit = true;
+        }
+    }
+    
     /// <inheritdoc />
     public void Dead()
     {
-        //TODO:显示死亡动画。
-        
+        _animator.SetTrigger(DeadId);
     }
 }

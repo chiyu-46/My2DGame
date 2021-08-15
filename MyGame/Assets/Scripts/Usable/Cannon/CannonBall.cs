@@ -20,6 +20,10 @@ public class CannonBall : MonoBehaviour, IPoolAble
     /// 炮弹爆炸对周围物体产生的冲击力。
     /// </summary>
     public float force;
+    /// <summary>
+    /// 攻击力。
+    /// </summary>
+    public int attack;
     /// <inheritdoc />
     public bool IsRecycled { get; set; }
 
@@ -64,6 +68,14 @@ public class CannonBall : MonoBehaviour, IPoolAble
         {
             Vector3 forceDirection = item.transform.position - transform.position;
             item.GetComponent<Rigidbody2D>().AddForce(forceDirection * force,ForceMode2D.Impulse);
+            if (item.GetComponent<PlayerController>())
+            {
+                item.GetComponent<PlayerController>().GetHit(attack);
+            }
+            else if (item.GetComponent<Enemy>())
+            {
+                item.GetComponent<Enemy>().GetHit(attack);
+            }
         }
     }
 }

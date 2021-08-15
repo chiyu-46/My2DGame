@@ -37,6 +37,10 @@ public class Bomb : MonoBehaviour, IPoolAble
     /// </summary>
     public float bombForce;
     /// <summary>
+    /// 攻击力。
+    /// </summary>
+    public int attack;
+    /// <summary>
     /// 炸弹Animator的Trigger“explosion”的id。
     /// </summary>
     private static readonly int Explosion = Animator.StringToHash("explosion");
@@ -85,6 +89,14 @@ public class Bomb : MonoBehaviour, IPoolAble
         {
             Vector3 forceDirection = item.transform.position - transform.position;
             item.GetComponent<Rigidbody2D>().AddForce(forceDirection * bombForce,ForceMode2D.Impulse);
+            if (item.GetComponent<PlayerController>())
+            {
+                item.GetComponent<PlayerController>().GetHit(attack);
+            }
+            else if (item.GetComponent<Enemy>())
+            {
+                item.GetComponent<Enemy>().GetHit(attack);
+            }
         }
     }
 

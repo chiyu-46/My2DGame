@@ -15,7 +15,7 @@ using UnityEngine;
 public class Test : MonoBehaviour
 {
     private TestA testA = new TestA();
-    private bool sign = false;
+    //private bool sign = false;
     
     private void Start()
     {
@@ -33,7 +33,7 @@ public class Test : MonoBehaviour
 
     private void BB()
     {
-        sign = true;
+        //sign = true;
         Debug.Log("成功执行测试方法。");
     }
 

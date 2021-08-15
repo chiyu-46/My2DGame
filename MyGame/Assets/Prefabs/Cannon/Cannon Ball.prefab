@@ -141,6 +141,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 2944
   force: 10
+  attack: 1
 --- !u!58 &-565369670733985694
 CircleCollider2D:
   m_ObjectHideFlags: 0
