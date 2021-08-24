@@ -303,7 +303,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1090655835186552635, guid: 769a7c90272e28e448d3af2cfa96a8c7, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.18
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1090655835186552635, guid: 769a7c90272e28e448d3af2cfa96a8c7, type: 3}
       propertyPath: m_LocalPosition.z
@@ -372,7 +372,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1090655835186552635, guid: 769a7c90272e28e448d3af2cfa96a8c7, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -5.69
+      value: -5.96
       objectReference: {fileID: 0}
     - target: {fileID: 1090655835186552635, guid: 769a7c90272e28e448d3af2cfa96a8c7, type: 3}
       propertyPath: m_LocalPosition.z
@@ -533,7 +533,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1090655835186552635, guid: 769a7c90272e28e448d3af2cfa96a8c7, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -4.9
+      value: -4.946
       objectReference: {fileID: 0}
     - target: {fileID: 1090655835186552635, guid: 769a7c90272e28e448d3af2cfa96a8c7, type: 3}
       propertyPath: m_LocalPosition.z
@@ -4639,7 +4639,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1090655835186552635, guid: 769a7c90272e28e448d3af2cfa96a8c7, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -2.85
+      value: -2.955
       objectReference: {fileID: 0}
     - target: {fileID: 1090655835186552635, guid: 769a7c90272e28e448d3af2cfa96a8c7, type: 3}
       propertyPath: m_LocalPosition.z
@@ -4708,7 +4708,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1090655835186552635, guid: 769a7c90272e28e448d3af2cfa96a8c7, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -5.69
+      value: -5.91
       objectReference: {fileID: 0}
     - target: {fileID: 1090655835186552635, guid: 769a7c90272e28e448d3af2cfa96a8c7, type: 3}
       propertyPath: m_LocalPosition.z
@@ -9753,7 +9753,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1090655835186552635, guid: 769a7c90272e28e448d3af2cfa96a8c7, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -3.866
+      value: -3.945
       objectReference: {fileID: 0}
     - target: {fileID: 1090655835186552635, guid: 769a7c90272e28e448d3af2cfa96a8c7, type: 3}
       propertyPath: m_LocalPosition.z
@@ -9943,7 +9943,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1090655835186552635, guid: 769a7c90272e28e448d3af2cfa96a8c7, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.18
+      value: 1.08
       objectReference: {fileID: 0}
     - target: {fileID: 1090655835186552635, guid: 769a7c90272e28e448d3af2cfa96a8c7, type: 3}
       propertyPath: m_LocalPosition.z
@@ -10523,14 +10523,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 1744731958, guid: c2ea1965ba72fb9459b598b99db044cf, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4534596171405235417, guid: c2ea1965ba72fb9459b598b99db044cf, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: -2.486
-      objectReference: {fileID: 0}
     - target: {fileID: 4534596171405235421, guid: c2ea1965ba72fb9459b598b99db044cf, type: 3}
       propertyPath: bombPool
       value: 
@@ -10582,10 +10574,6 @@ PrefabInstance:
     - target: {fileID: 4534596171523822315, guid: c2ea1965ba72fb9459b598b99db044cf, type: 3}
       propertyPath: m_Name
       value: Player Control
-      objectReference: {fileID: 0}
-    - target: {fileID: 4534596171523822315, guid: c2ea1965ba72fb9459b598b99db044cf, type: 3}
-      propertyPath: m_IsActive
-      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c2ea1965ba72fb9459b598b99db044cf, type: 3}
@@ -10898,10 +10886,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 2443685311802627955, guid: 2a3df8f64f8636045aa8e206eeb645da, type: 3}
-      propertyPath: health
-      value: 3
-      objectReference: {fileID: 0}
     - target: {fileID: 6636937998477418173, guid: 2a3df8f64f8636045aa8e206eeb645da, type: 3}
       propertyPath: m_Name
       value: Cucumber

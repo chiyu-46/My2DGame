@@ -53,6 +53,10 @@ public class PlayerController : MonoBehaviour, IWoundable
     /// </summary>
     private Rigidbody2D _rb;
     /// <summary>
+    /// Player动画器组件的引用。
+    /// </summary>
+    private Animator _animator;
+    /// <summary>
     /// Player的PlayerInput组件。
     /// </summary>
     private PlayerInput _playerInput;
@@ -73,6 +77,14 @@ public class PlayerController : MonoBehaviour, IWoundable
     /// Player的速度，缓慢加减速由Unity输入轴实现。
     /// </summary>
     public float speed;
+    /// <summary>
+    /// 动画控制参数Dead的id值。
+    /// </summary>
+    private static readonly int DeadId = Animator.StringToHash("Dead");
+    /// <summary>
+    /// 动画控制参数GetHit的id值。
+    /// </summary>
+    private static readonly int GETHitId = Animator.StringToHash("GetHit");
     
     /// <summary>
     /// 位于Player脚下的点的引用。以此为中心检测脚下是否有地面。
@@ -114,16 +126,20 @@ public class PlayerController : MonoBehaviour, IWoundable
     /// <remarks>
     /// 用于处理禁锢技能或进出门时不能移动的功能。
     /// </remarks>
+    [HideInInspector]
     public bool canMove;
     /// <summary>
     /// 用于确定Player当前处于使用门的哪个阶段。
     /// </summary>
+    [HideInInspector]
     public int currentUseDoorState;
     
     void Start()
     {
         //获取刚体组件。
         _rb = GetComponent<Rigidbody2D>();
+        //获取动画器组件。
+        _animator = GetComponent<Animator>();
         //获取PlayerInput组件。
         _playerInput = GetComponent<PlayerInput>();
         //获取控制移动的Action。
@@ -219,28 +235,41 @@ public class PlayerController : MonoBehaviour, IWoundable
     /// <inheritdoc />
     public void GetHit(int damage)
     {
-        //TODO:播放受伤动画。
-        //如果防御力大于受到伤害，则不受伤害。
-        int real = damage - Defense;
-        if (real <= 0)
+        if (CanGetHit)
         {
-            return;
-        }
-        //受到伤害。
-        Health = Health - real;
-        //如果此次受伤导致死亡，将调用Dead方法。
-        if (Health <= 0)
-        {
-            //TODO:避免再次受到伤害。
-            Health = 0;
-            Dead();
+            //如果防御力大于受到伤害，则不受伤害。
+            int real = damage - Defense;
+            if (real <= 0)
+            {
+                return;
+            }
+            //受到伤害。
+            CanGetHit = false;
+            Health = Health - real;
+            //如果此次受伤导致死亡，将不播放受伤动画，直接死亡。
+            if (Health <= 0)
+            {
+                Dead();
+            }
+            else
+            {
+                _animator.SetTrigger(GETHitId);
+            }
         }
     }
 
+    /// <summary>
+    /// 受伤动画播放完成，可以接受下一次攻击。动画系统调用。
+    /// </summary>
+    public void GetHitAnimationFinished()
+    {
+        CanGetHit = true;
+    }
+    
     /// <inheritdoc />
     public void Dead()
     {
-        //TODO:显示死亡动画。
+        _animator.SetTrigger(DeadId);
         canMove = false;
     }
 
@@ -319,7 +348,9 @@ public class PlayerController : MonoBehaviour, IWoundable
     /// </summary>
     public void FinishOutDoor()
     {
+        //恢复使用者移动能力。
         canMove = true;
+        _rb.isKinematic = false;
         currentUseDoorState = (int)UseDoorState.UnUseDoor;
     }
 }

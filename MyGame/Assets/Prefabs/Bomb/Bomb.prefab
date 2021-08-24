@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 8866530345644645394}
   m_Layer: 9
   m_Name: Bomb
-  m_TagString: Untagged
+  m_TagString: Bomb
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -154,10 +154,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 62dce68baab24c9488ec4236c2a54b3a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  waitTime: 5
+  State: 0
+  waitTime: 4
   explosionRadius: 1.4
   targetLayer:
     serializedVersion: 2
-    m_Bits: 384
+    m_Bits: 896
   bombForce: 5
   attack: 1

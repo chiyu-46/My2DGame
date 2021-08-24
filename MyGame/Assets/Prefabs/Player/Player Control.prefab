@@ -63,7 +63,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4534596171405235397}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -13.4, y: 1.95, z: 0}
+  m_LocalPosition: {x: -2.486, y: 1.95, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4534596170629330896}
@@ -297,7 +297,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6a0c9c710caf12442b16bdaaa345a3e7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  health: 2
+  health: 3
   defense: 0
   maxHealth: 3
   jumpForce: 5
@@ -337,7 +337,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 00b153eb021b6cf42b021d72e3def1e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  coolingTime: 3
+  coolingTime: 2
   bombPool: {fileID: 0}
 --- !u!114 &2859969184963152594
 MonoBehaviour:
@@ -457,6 +457,10 @@ PrefabInstance:
     - target: {fileID: 6465722740341516122, guid: 7ef48415aa3aa974fb6ce51a0ffde00a, type: 3}
       propertyPath: m_Name
       value: RunVFX
+      objectReference: {fileID: 0}
+    - target: {fileID: 6465722740341516122, guid: 7ef48415aa3aa974fb6ce51a0ffde00a, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6465722740341516123, guid: 7ef48415aa3aa974fb6ce51a0ffde00a, type: 3}
       propertyPath: m_RootOrder

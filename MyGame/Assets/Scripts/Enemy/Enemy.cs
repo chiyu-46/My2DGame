@@ -34,33 +34,44 @@ public class Enemy : BaseFSM, IWoundable
     /// <summary>
     /// 当前敌人的Animator。
     /// </summary>
-    private Animator _animator;
+    protected Animator EnemyAnimator;
+    /// <summary>
+    /// 当前敌人的Animator。
+    /// </summary>
+    public Animator AnimatorGetter { get => EnemyAnimator; }
     /// <summary>
     /// 当前敌人的Rigidbody2D。
     /// </summary>
-    private Rigidbody2D _rb;
+    protected Rigidbody2D _rb;
+    /// <summary>
+    /// 当前敌人的Rigidbody2D。
+    /// </summary>
+    public Rigidbody2D RigidbodyGetter { get => _rb; }
     
     #endregion
     
     #region 状态机转换需要的参数
 
     /// <summary>
-    /// 是否发现玩家。
-    /// </summary>
-    private bool _findPlayer = false;
-    /// <summary>
-    /// 是否发现炸弹。
-    /// </summary>
-    private bool _findBomb = false;
-    /// <summary>
     /// 是否被攻击。
     /// </summary>
-    private bool _getHit = false;
-    private bool _getHitAnimationFinished = false;
+    protected bool _getHit;
+    /// <summary>
+    /// 攻击动画是否播放完成。
+    /// </summary>
+    private bool _getHitAnimationFinished;
     /// <summary>
     /// 是否已经死亡。
     /// </summary>
-    private bool _dead = false;
+    protected bool _dead;
+    /// <summary>
+    /// 是否找到目标。
+    /// </summary>
+    protected bool _findTarget;
+    /// <summary>
+    /// 是否找到目标。
+    /// </summary>
+    public bool FindTarget { set { _findTarget = value; } }
 
     #endregion
 
@@ -89,22 +100,50 @@ public class Enemy : BaseFSM, IWoundable
     #region 运动参数。
 
     /// <summary>
+    /// 敌人能不能移动。
+    /// </summary>
+    protected bool CanMove;
+    public bool CanMoveSetter { set => CanMove = value; }
+    /// <summary>
     /// 敌人的速度。
     /// </summary>
     [SerializeField][Header("Movement")]
     protected float Speed;
+    //TODO:此值作为真实使用值。将在巡逻速度与追击速度间切换。
     /// <summary>
     /// 敌人的弹跳力。
     /// </summary>
     [SerializeField]
     protected float JumpForce;
     /// <summary>
-    /// 用于Player动画控制器，Player开始跳跃时设置为true，Player动画控制器检测到后设为false。
+    /// 跳跃时收到的向上的力的向量。
     /// </summary>
-    public bool StartJump { get; set; }
+    protected Vector2 JumpForceVector;
+    /// <summary>
+    /// 用于控制人物跳跃，开始跳跃时设置为true，落地设为false。
+    /// </summary>
+    protected bool IsJumping;
+    /// <summary>
+    /// 跳跃结束。
+    /// </summary>
+    protected bool JumpEnd;
+    /// <summary>
+    /// Enemy跳跃时的方向。用于与速度相乘，只能取值-1（向左），0（没有左右移动），1（向右）.
+    /// </summary>
+    protected sbyte JumpDirection;
+    /// <summary>
+    /// 默认物理材质。
+    /// </summary>
+    [SerializeField]
+    protected PhysicsMaterial2D defaultMaterial2D;
+    /// <summary>
+    /// 跳跃时使用的物理材质。
+    /// </summary>
+    [SerializeField]
+    protected PhysicsMaterial2D jumpMaterial2D;
 
     #endregion
-
+    
     #region 巡逻状态参数
 
     /// <summary>
@@ -121,6 +160,63 @@ public class Enemy : BaseFSM, IWoundable
     /// 敌人到达巡逻路径点的时间。
     /// </summary>
     protected float ReachTime;
+
+    #endregion
+    
+    #region 追击目标状态参数
+
+    /// <summary>
+    /// 控制当前敌人攻击的对象的碰撞器，用于控制敌人能不能发起攻击。
+    /// </summary>
+    protected Collider2D _attacker;
+    /// <summary>
+    /// 当前敌人的视野对象。
+    /// </summary>
+    protected EnemyVision Vision;
+    /// <summary>
+    /// 当前敌人的视野对象。
+    /// </summary>
+    public EnemyVision VisionGetter { get => Vision; }
+    /// <summary>
+    /// 此敌人首选的追击目标。值为首选目标的Tag。
+    /// </summary>
+    protected string Preference;
+    /// <summary>
+    /// 当前目标是不是首选目标。
+    /// </summary>
+    protected bool IsPreferred;
+    /// <summary>
+    /// 当前目标是不是首选目标。
+    /// </summary>
+    public bool IsPreferredSetter { set => IsPreferred = value; }
+    /// <summary>
+    /// 当前目标的位置。
+    /// </summary>
+    protected Vector2 TargetPos;
+    /// <summary>
+    /// 当前目标的位置。
+    /// </summary>
+    public Vector2 TargetPosSetter { set => TargetPos = value; }
+    /// <summary>
+    /// 获得当前目标位置的时间。用于如果目标位置无法到达时，强制更新目标位置。
+    /// </summary>
+    protected float GetTargetTime;
+    /// <summary>
+    /// 获得当前目标位置的时间。用于如果目标位置无法到达时，强制更新目标位置。
+    /// </summary>
+    public float GetTargetTimeSetter { set => GetTargetTime = value; }
+    /// <summary>
+    /// 等待到达目标点的极限时间。
+    /// </summary>
+    protected float PrescribedTime = 3;
+    /// <summary>
+    /// 追到当前目标点时是否需要跳跃。
+    /// </summary>
+    protected bool ShouldJump;
+    /// <summary>
+    /// 追到当前目标点时是否需要跳跃。
+    /// </summary>
+    public bool ShouldJumpSetter { set => ShouldJump = value; }
 
     #endregion
     
@@ -146,13 +242,17 @@ public class Enemy : BaseFSM, IWoundable
     /// 动画控制参数GetHit的id值。
     /// </summary>
     private static readonly int GETHitId = Animator.StringToHash("GetHit");
+    /// <summary>
+    /// 动画控制参数StartJump的id值。
+    /// </summary>
+    protected static readonly int StartJump = Animator.StringToHash("StartJump");
 
     #endregion
 
     #region 地面检测
 
     /// <summary>
-    /// 位于Player脚下的点的引用。以此为中心检测脚下是否有地面。
+    /// 位于角色脚下的点的引用。以此为中心检测脚下是否有地面。
     /// </summary>
     [Header("Ground Check")]
     public Transform groundChecker;
@@ -176,19 +276,20 @@ public class Enemy : BaseFSM, IWoundable
 
     #endregion
     
-    
-    
     public override void Awake()
     {
         base.Awake();
-        _animator = GetComponent<Animator>();
+        _attacker = transform.GetChild(2).GetComponent<Collider2D>();
+        Vision = transform.GetChild(1).GetComponent<EnemyVision>();
+        EnemyAnimator = GetComponent<Animator>();
         _rb = GetComponent<Rigidbody2D>();
         Route = new List<Vector2>();
         CanGetHit = true;
+        CanMove = true;
+        JumpForceVector = new Vector2(0, JumpForce);
+        _rb.sharedMaterial = defaultMaterial2D;
         //添加状态。
         AllStates.Add("Patrol",new FSMState("Patrol"));
-        AllStates.Add("FindPlayer",new FSMState("FindPlayer"));
-        AllStates.Add("FindBomb",new FSMState("FindBomb"));
         AllStates.Add("GitHit",new FSMState("GitHit"));
         AllStates.Add("Dead",new FSMState("Dead"));
         //添加每个状态要执行的内容。
@@ -196,8 +297,6 @@ public class Enemy : BaseFSM, IWoundable
         tempState = AllStates["Patrol"];
         tempState.OnStateEnter += OnPatrolStateEnter;
         tempState.OnStateStay += OnPatrolStateStay;
-        tempState = AllStates["FindPlayer"];
-        tempState = AllStates["FindBomb"];
         tempState = AllStates["GitHit"];
         tempState.OnStateStay += StartGitHitAnimation;
         tempState.OnStateExit += GetHitStateExit;
@@ -210,19 +309,7 @@ public class Enemy : BaseFSM, IWoundable
         //巡逻状态转换其他状态条件。
         tempStateTranslations = AllStates["Patrol"].FsmTranslations;
         tempStateTranslations.Add(new FSMTranslation("GitHit",() => _getHit));
-        tempStateTranslations.Add(new FSMTranslation("FindBomb",() => _findBomb));
-        tempStateTranslations.Add(new FSMTranslation("FindPlayer",(() => _findPlayer)));
-        //发现玩家状态转换其他状态条件。
-        //发现炸弹的优先级比发现玩家高。
-        tempStateTranslations = AllStates["FindPlayer"].FsmTranslations;
-        tempStateTranslations.Add(new FSMTranslation("GitHit",(() => _getHit)));
-        tempStateTranslations.Add(new FSMTranslation("FindBomb",(() => _findBomb)));
-        tempStateTranslations.Add(new FSMTranslation("Patrol",(() => _findPlayer == false)));
-        //发现炸弹状态转换其他状态条件。
-        tempStateTranslations = AllStates["FindBomb"].FsmTranslations;
-        tempStateTranslations.Add(new FSMTranslation("GitHit",(() => _getHit)));
-        tempStateTranslations.Add(new FSMTranslation("Patrol",(() => _findBomb == false)));
-        //受伤状态后将进入巡逻状态。
+        //受伤状态结束后将进入巡逻状态或者死亡状态。
         tempStateTranslations = AllStates["GitHit"].FsmTranslations;
         tempStateTranslations.Add(new FSMTranslation("Dead",(() => _dead)));
         tempStateTranslations.Add(new FSMTranslation("Patrol", () => _getHitAnimationFinished));
@@ -232,13 +319,15 @@ public class Enemy : BaseFSM, IWoundable
     private void FixedUpdate()
     {
         GroundCheck();
-        _animator.SetBool(ONGround,IsGround);
-        _animator.SetFloat(VelocityX,Mathf.Abs(_rb.velocity.x));
-        _animator.SetFloat(VelocityY,_rb.velocity.y);
+        EnemyAnimator.SetBool(ONGround,IsGround);
+        EnemyAnimator.SetFloat(VelocityX,Mathf.Abs(_rb.velocity.x));
+        EnemyAnimator.SetFloat(VelocityY,_rb.velocity.y);
     }
 
+    #region 巡逻状态使用
+
     /// <summary>
-    /// 在巡逻状态进入时执行。
+    /// 在巡逻状态进入时执行。获取当前所在平面的预设巡逻点。
     /// </summary>
     private void OnPatrolStateEnter()
     {
@@ -246,7 +335,7 @@ public class Enemy : BaseFSM, IWoundable
     }
     
     /// <summary>
-    /// 在巡逻状态进入时执行。
+    /// 在巡逻状态时执行。在各巡逻点间移动。
     /// </summary>
     private void OnPatrolStateStay()
     {
@@ -254,11 +343,14 @@ public class Enemy : BaseFSM, IWoundable
     }
     
     /// <summary>
-    /// 在巡逻时，根据目标点与自己的位置确定当前应当的朝向。
+    /// 在移动时，确定当前应当的朝向。
     /// </summary>
+    /// <remarks>
+    /// 和巡逻移动方法分离，是因为改变方向不需要每帧运行，所以交给动画系统调用。
+    /// </remarks>
     public void ChangeDirection()
     {
-        if (GetCurrentPatrolPoint().x - transform.position.x > 0)
+        if (_rb.velocity.x > 0.1)
         {
             transform.rotation = Quaternion.Euler(0,180,0);
         }
@@ -298,7 +390,7 @@ public class Enemy : BaseFSM, IWoundable
     private void GetRoute()
     {
         Route.Clear();
-        Collider2D[] routes = Physics2D.OverlapCircleAll(transform.position, .5f, routeLayerMask);
+        Collider2D[] routes = Physics2D.OverlapCircleAll(groundChecker.position, checkRadius, routeLayerMask);
         if (routes.Length != 0)
         {
             List<float> routesX= routes[Random.Range(0,routes.Length)].GetComponent<Route>().GetRoute();
@@ -327,7 +419,40 @@ public class Enemy : BaseFSM, IWoundable
     {
         return Route[CurrentRouteId];
     }
+    
+    #endregion
 
+    #region 追击状态用
+
+    
+    /// <summary>
+    /// 攻击动画播放完成，可以进行下一次攻击。动画系统调用。
+    /// </summary>
+    public void HitAnimationFinished()
+    {
+        //可以进行下一次攻击。
+        _attacker.GetComponent<EnemyAttack>().CanHitSetter = true;
+        //报告攻击完成后目标位置。
+        Vision.ReportTargetPos();
+        //攻击完成后可以移动。
+        CanMove = true;
+    }
+
+    /// <summary>
+    /// 跳跃动画完成，可以获取下一个目标点。
+    /// </summary>
+    public void JumpAnimationFinished()
+    {
+        if (IsJumping)
+        {
+            JumpEnd = true;
+        }
+    }
+    
+    #endregion
+    
+    #region 地面检测
+    
     /// <summary>
     /// 展示地面检测圈的位置与大小。
     /// </summary>
@@ -355,6 +480,10 @@ public class Enemy : BaseFSM, IWoundable
             _rb.gravityScale = 4;
         }
     }
+    
+    #endregion
+
+    #region 受伤与死亡
     
     /// <inheritdoc />
     public void GetHit(int damage)
@@ -388,7 +517,7 @@ public class Enemy : BaseFSM, IWoundable
     {
         if (_getHit)
         {
-            _animator.SetTrigger(GETHitId);
+            EnemyAnimator.SetTrigger(GETHitId);
             _getHit = false;
         }
     }
@@ -396,7 +525,7 @@ public class Enemy : BaseFSM, IWoundable
     /// <summary>
     /// 受伤动画播放完成。动画系统调用。
     /// </summary>
-    public void GitHitAnimationFinished()
+    public void GetHitAnimationFinished()
     {
         _getHitAnimationFinished = true;
     }
@@ -417,6 +546,8 @@ public class Enemy : BaseFSM, IWoundable
     /// <inheritdoc />
     public void Dead()
     {
-        _animator.SetTrigger(DeadId);
+        EnemyAnimator.SetTrigger(DeadId);
     }
+    
+    #endregion
 }

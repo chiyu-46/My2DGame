@@ -20,10 +20,12 @@ public class Door : MonoBehaviour, IUsable
     /// <summary>
     /// 门当前是否是打开的状态。
     /// </summary>
+    [HideInInspector]
     public bool isOpen;
     /// <summary>
     /// 当前门是不是入口。
     /// </summary>
+    [HideInInspector]
     public bool isEntrance;
     /// <summary>
     /// 此门的使用者。
@@ -92,6 +94,7 @@ public class Door : MonoBehaviour, IUsable
             _user = user;
             //使用者在本次使用结束前，不能移动。
             _user.GetComponent<PlayerController>().canMove = false;
+            _user.GetComponent<Rigidbody2D>().isKinematic = true;
             //此门被使用，所以是入口。
             isEntrance = true;
             //Player进入使用门状态。
