@@ -84,8 +84,6 @@ namespace FSM
                 CurrentState.OnStateStay();
             }
         }
-        
-        
     }
 }
 

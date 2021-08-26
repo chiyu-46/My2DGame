@@ -147,6 +147,7 @@ public class PlayerController : MonoBehaviour, IWoundable
         //将跳跃力的值变成跳跃力向量。
         _jumpForceVector = Vector2.up * jumpForce;
         canMove = true;
+        CanGetHit = true;
         currentUseDoorState = (int)UseDoorState.UnUseDoor;
     }
 
@@ -271,6 +272,8 @@ public class PlayerController : MonoBehaviour, IWoundable
     {
         _animator.SetTrigger(DeadId);
         canMove = false;
+        CanGetHit = false;
+        GetComponent<Collider2D>().enabled = false;
     }
 
     /// <summary>
