@@ -18,7 +18,7 @@ public class BaldPirateAttack : EnemyAttack
     {
         if (CanHit)
         {
-            if (other.CompareTag("Player"))
+            if (other.CompareTag("Player") && !other.GetComponent<PlayerController>().IsDead)
             {
                 EnemyAnimator.SetTrigger(AttackToPlayer);
                 //TODO:在攻击时刻进行攻击，而不是直接判定进入攻击范围就受到攻击。

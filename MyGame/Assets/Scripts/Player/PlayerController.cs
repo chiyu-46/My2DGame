@@ -38,15 +38,18 @@ public class PlayerController : MonoBehaviour, IWoundable
     private int defense;
     [SerializeField] 
     private int maxHealth;
+    /// <summary>
+    /// Player是否已经死了。
+    /// </summary>
+    private bool _isDead;
     /// <inheritdoc />
-    public int Health
-    {
-        get => health;
-        set { health = value > maxHealth ? maxHealth : value; }
-    }
-
+    public int Health { get => health; set { health = value > maxHealth ? maxHealth : value; } }
     /// <inheritdoc />
     public int Defense { get => defense; set => defense = value; }
+    /// <summary>
+    /// Player是否已经死了。
+    /// </summary>
+    public bool IsDead { get => _isDead; }
     
     /// <summary>
     /// Player的刚体组件。
@@ -273,7 +276,7 @@ public class PlayerController : MonoBehaviour, IWoundable
         _animator.SetTrigger(DeadId);
         canMove = false;
         CanGetHit = false;
-        GetComponent<Collider2D>().enabled = false;
+        _isDead = true;
     }
 
     /// <summary>

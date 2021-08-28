@@ -64,6 +64,16 @@ public class EnemyVision : MonoBehaviour
             }
             return;
         }
+        //如果Player已死亡
+        if (other.CompareTag("Player") && other.GetComponent<PlayerController>().IsDead)
+        {
+            //如果Player已死亡，并且是当前目标，则更改当前目标。
+            if (_currentTarget == other.transform)
+            {
+                _currentTarget = null;
+            }
+            return;
+        }
         if (_currentTarget is null)
         {
             _currentTarget = other.transform;
