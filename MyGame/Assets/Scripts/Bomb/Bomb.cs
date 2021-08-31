@@ -97,11 +97,16 @@ public class Bomb : MonoBehaviour, IPoolAble
     /// 自己是否已经被回收到对象池。
     /// </summary>
     public bool IsRecycled { get; set; }
-    
-    void Start()
+
+    private void Awake()
     {
         _animator = GetComponent<Animator>();
         _rigidbody = GetComponent<Rigidbody2D>();
+    }
+
+    void Start()
+    {
+        
     }
 
     private void OnEnable()
