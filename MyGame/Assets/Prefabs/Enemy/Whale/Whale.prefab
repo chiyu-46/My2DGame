@@ -193,7 +193,7 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0.028131843, y: -0.09064698}
+  m_Offset: {x: -0.20733368, y: -0.09064698}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -204,7 +204,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 2.006221, y: 1.256206}
+  m_Size: {x: 1.53529, y: 1.256206}
   m_EdgeRadius: 0
 --- !u!95 &3670112612412878784
 Animator:
@@ -242,17 +242,20 @@ MonoBehaviour:
   routeLayerMask:
     serializedVersion: 2
     m_Bits: 32768
-  Speed: 3
+  patrolSpeed: 3
   JumpForce: 10
   defaultMaterial2D: {fileID: 6200000, guid: cfe5cecc26cacf242a5901f5d1ec8d3e, type: 2}
   jumpMaterial2D: {fileID: 6200000, guid: 68b56ae134eebdb43ab0b9194d1dacdf, type: 2}
   PatrolIdleTime: 2
   LostIdleTime: 3
+  findToMoveTime: 1
   groundChecker: {fileID: 338355468970297150}
   checkRadius: 0.2
   groundLayer:
     serializedVersion: 2
     m_Bits: 64
+  chasingSpeed: 7
+  RecoverTime: 4
 --- !u!1 &5600564301464107578
 GameObject:
   m_ObjectHideFlags: 0

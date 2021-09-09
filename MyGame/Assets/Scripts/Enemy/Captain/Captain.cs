@@ -3,6 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using FSM;
 
+/// <summary>
+/// 用于管理敌人——船长的AI逻辑。
+/// </summary>
+/// <remarks>
+/// 基本逻辑：
+/// 发现玩家，加速追击。
+/// 发现炸弹，转头逃跑。
+/// </remarks>
 public class Captain : Enemy
 {
     /// <summary>
@@ -14,14 +22,24 @@ public class Captain : Enemy
     /// </summary>
     private float _findBombStateStartTime;
     /// <summary>
-    /// 如果进入发现炸弹状态，将要等待的时间。
+    /// 如果进入发现炸弹状态，保持慌张逃窜状态的时间。
     /// </summary>
-    [SerializeField]
+    [SerializeField][Header("Personalization")]
     private float findBombStateWaitTime;
     /// <summary>
     /// 逃离炸弹时奔跑的方向。只能使用-1（向左），0（不动），1（向右）。
     /// </summary>
     private sbyte _runDirection;
+    /// <summary>
+    /// 遇到炸弹时的速度。
+    /// </summary>
+    [SerializeField]
+    private float escapeSpeed;
+    /// <summary>
+    /// 追逐玩家时的速度。
+    /// </summary>
+    [SerializeField]
+    private float chasingSpeed;
 
     private static readonly int FindBomb = Animator.StringToHash("FindBomb");
 
@@ -69,6 +87,7 @@ public class Captain : Enemy
     /// </summary>
     private void StartFindBombState()
     {
+        realSpeed = escapeSpeed;
         _findBombStateStartTime = Time.time;
         AnimatorGetter.SetBool(FindBomb,true);
     }
@@ -78,6 +97,7 @@ public class Captain : Enemy
     /// </summary>
     private void EndFindBombState()
     {
+        realSpeed = patrolSpeed;
         //重置结束发现炸弹状态的条件。
         _isFindBombStateOver = false;
         AnimatorGetter.SetBool(FindBomb,false);
@@ -103,7 +123,7 @@ public class Captain : Enemy
                 
                 }
             }
-            _rb.velocity = new Vector2(_runDirection * Speed, _rb.velocity.y);
+            _rb.velocity = new Vector2(_runDirection * realSpeed, _rb.velocity.y);
         }
         else
         {
@@ -119,8 +139,10 @@ public class Captain : Enemy
     /// </summary>
     private void GetReady()
     {
+        realSpeed = chasingSpeed;
         _attacker.enabled = true;
         _rb.sharedMaterial = jumpMaterial2D;
+        StartCoroutine(WaitForStartMove());
     }
     
     /// <summary>
@@ -131,6 +153,7 @@ public class Captain : Enemy
     /// </remarks>
     private void Relax()
     {
+        realSpeed = patrolSpeed;
         _attacker.enabled = false;
         Vision.GetComponent<Collider2D>().enabled = true;
         _rb.sharedMaterial = defaultMaterial2D;
@@ -151,7 +174,7 @@ public class Captain : Enemy
                 Vision.GetComponent<Collider2D>().enabled = true;
                 Vision.ReportTargetPos();
             }
-            _rb.velocity = new Vector2(JumpDirection * Speed, _rb.velocity.y);
+            _rb.velocity = new Vector2(JumpDirection * realSpeed, _rb.velocity.y);
             return;
         }
         //攻击时不能移动。
@@ -165,12 +188,12 @@ public class Captain : Enemy
             if (TargetPos.x - transform.position.x > 0.1)
             {
                 //向右追
-                _rb.velocity = new Vector2(Speed, _rb.velocity.y);
+                _rb.velocity = new Vector2(realSpeed, _rb.velocity.y);
             }
             else if(TargetPos.x - transform.position.x < -0.1)
             {
                 //向左追
-                _rb.velocity = new Vector2(-Speed, _rb.velocity.y);
+                _rb.velocity = new Vector2(-realSpeed, _rb.velocity.y);
             }
             else
             {

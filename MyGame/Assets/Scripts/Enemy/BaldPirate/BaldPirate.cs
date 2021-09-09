@@ -5,6 +5,12 @@ using FSM;
 
 public class BaldPirate : Enemy
 {
+    /// <summary>
+    /// 追逐玩家或炸弹时的速度。
+    /// </summary>
+    [SerializeField][Header("Personalization")]
+    private float chasingSpeed;
+    
     public override void Awake()
     {
         base.Awake();
@@ -36,8 +42,10 @@ public class BaldPirate : Enemy
     /// </summary>
     private void GetReady()
     {
+        realSpeed = chasingSpeed;
         _attacker.enabled = true;
         _rb.sharedMaterial = jumpMaterial2D;
+        StartCoroutine(WaitForStartMove());
     }
     
     /// <summary>
@@ -48,6 +56,7 @@ public class BaldPirate : Enemy
     /// </remarks>
     private void Relax()
     {
+        realSpeed = patrolSpeed;
         _attacker.enabled = false;
         Vision.GetComponent<Collider2D>().enabled = true;
         _rb.sharedMaterial = defaultMaterial2D;
@@ -68,7 +77,7 @@ public class BaldPirate : Enemy
                 Vision.GetComponent<Collider2D>().enabled = true;
                 Vision.ReportTargetPos();
             }
-            _rb.velocity = new Vector2(JumpDirection * Speed, _rb.velocity.y);
+            _rb.velocity = new Vector2(JumpDirection * realSpeed, _rb.velocity.y);
             return;
         }
         //攻击时不能移动。
@@ -82,12 +91,12 @@ public class BaldPirate : Enemy
             if (TargetPos.x - transform.position.x > 0.1)
             {
                 //向右追
-                _rb.velocity = new Vector2(Speed, _rb.velocity.y);
+                _rb.velocity = new Vector2(realSpeed, _rb.velocity.y);
             }
             else if(TargetPos.x - transform.position.x < -0.1)
             {
                 //向左追
-                _rb.velocity = new Vector2(-Speed, _rb.velocity.y);
+                _rb.velocity = new Vector2(-realSpeed, _rb.velocity.y);
             }
             else
             {

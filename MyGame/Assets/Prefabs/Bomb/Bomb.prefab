@@ -155,10 +155,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   State: 0
-  waitTime: 4
+  waitTime: 3
   explosionRadius: 1.4
   targetLayer:
     serializedVersion: 2
-    m_Bits: 896
-  bombForce: 5
+    m_Bits: 2944
+  bombForce: 10
   attack: 1

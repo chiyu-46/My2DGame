@@ -178,7 +178,7 @@ public class Bomb : MonoBehaviour, IPoolAble
     /// 点燃炸弹，设置引信时间。
     /// </summary>
     /// <param name="lastTime">当前炸弹引信的时间（秒），即多少秒后爆炸。</param>
-    public void Ignite(int lastTime = -1)
+    public void Ignite(float? lastTime = null)
     {
         if (!(State == BombState.IsHeld))
         {
@@ -187,7 +187,7 @@ public class Bomb : MonoBehaviour, IPoolAble
         _startTime = Time.time;
         _animator.SetTrigger(ON);
         _isBombOff = false;
-        _lastTime = lastTime == -1 ? _lastTime : lastTime;
+        _lastTime = lastTime ?? _lastTime;
     }
 
     /// <summary>

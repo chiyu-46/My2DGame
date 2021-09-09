@@ -105,11 +105,14 @@ public class Enemy : BaseFSM, IWoundable
     protected bool CanMove;
     public bool CanMoveSetter { set => CanMove = value; }
     /// <summary>
-    /// 敌人的速度。
+    /// 敌人巡逻时的速度。
     /// </summary>
     [SerializeField][Header("Movement")]
-    protected float Speed;
-    //TODO:此值作为真实使用值。将在巡逻速度与追击速度间切换。
+    protected float patrolSpeed;
+    /// <summary>
+    /// 敌人当前的真实速度。
+    /// </summary>
+    protected float realSpeed;
     /// <summary>
     /// 敌人的弹跳力。
     /// </summary>
@@ -217,7 +220,11 @@ public class Enemy : BaseFSM, IWoundable
     /// 追到当前目标点时是否需要跳跃。
     /// </summary>
     public bool ShouldJumpSetter { set => ShouldJump = value; }
-
+    /// <summary>
+    /// 从发现目标到可以移动的反应时间。
+    /// </summary>
+    [SerializeField]
+    protected float findToMoveTime;
     #endregion
     
     #region 动画触发器
@@ -279,6 +286,7 @@ public class Enemy : BaseFSM, IWoundable
     public override void Awake()
     {
         base.Awake();
+        realSpeed = patrolSpeed;
         _attacker = transform.GetChild(2).GetComponent<Collider2D>();
         Vision = transform.GetChild(1).GetComponent<EnemyVision>();
         EnemyAnimator = GetComponent<Animator>();
@@ -379,11 +387,11 @@ public class Enemy : BaseFSM, IWoundable
             }
             if (GetCurrentPatrolPoint().x - transform.position.x > 0)
             {
-                _rb.velocity = new Vector2(Speed, _rb.velocity.y);
+                _rb.velocity = new Vector2(realSpeed, _rb.velocity.y);
             }
             else
             {
-                _rb.velocity = new Vector2(-Speed, _rb.velocity.y);
+                _rb.velocity = new Vector2(-realSpeed, _rb.velocity.y);
             }
         }
     }
@@ -452,6 +460,16 @@ public class Enemy : BaseFSM, IWoundable
 
     #region 追击状态用
 
+    /// <summary>
+    /// 给予敌人反射弧时间。
+    /// </summary>
+    protected virtual IEnumerator WaitForStartMove()
+    {
+        _rb.velocity = Vector2.zero;
+        CanMove = false;
+        yield return new WaitForSeconds(findToMoveTime);
+        CanMove = true;
+    }
     
     /// <summary>
     /// 攻击动画播放完成，可以进行下一次攻击。动画系统调用。

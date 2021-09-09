@@ -18,6 +18,7 @@ public class WhaleAttack : EnemyAttack
             {
                 EnemyAnimator.SetTrigger(AttackToBomb);
                 other.GetComponent<Bomb>().OnRecycled();
+                (Head as Whale)!.Decelerate();
             }
             else
             {

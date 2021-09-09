@@ -343,14 +343,16 @@ MonoBehaviour:
   routeLayerMask:
     serializedVersion: 2
     m_Bits: 32768
-  Speed: 3
+  patrolSpeed: 3
   JumpForce: 10
   defaultMaterial2D: {fileID: 6200000, guid: cfe5cecc26cacf242a5901f5d1ec8d3e, type: 2}
   jumpMaterial2D: {fileID: 6200000, guid: 68b56ae134eebdb43ab0b9194d1dacdf, type: 2}
   PatrolIdleTime: 2
   LostIdleTime: 3
+  findToMoveTime: 1
   groundChecker: {fileID: 8055650476361940635}
   checkRadius: 0.2
   groundLayer:
     serializedVersion: 2
     m_Bits: 64
+  chasingSpeed: 5

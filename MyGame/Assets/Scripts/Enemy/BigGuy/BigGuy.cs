@@ -4,13 +4,25 @@ using System.Collections.Generic;
 using UnityEngine;
 using FSM;
 
+/// <summary>
+/// 用于管理敌人——大块头的AI逻辑。
+/// </summary>
+/// <remarks>
+/// 基本逻辑：
+/// 出生携带炸弹巡逻，仅在乎进入视野的玩家，无视炸弹。
+/// 发现玩家，停下，0.25s内点燃炸弹，0.25s后开始向玩家冲刺。
+/// </remarks>
 public class BigGuy : Enemy
 {
     /// <summary>
     /// 追击玩家的方向。只能使用-1（向左），0（不动），1（向右）。
     /// </summary>
     private sbyte _directionOfPursuit;
-
+    /// <summary>
+    /// 追逐玩家时的速度。
+    /// </summary>
+    [SerializeField][Header("Personalization")]
+    private float chasingSpeed;
     /// <summary>
     /// 此敌人用于控制手中炸弹的关节。
     /// </summary>
@@ -83,9 +95,11 @@ public class BigGuy : Enemy
     /// </summary>
     private void GetReady()
     {
+        realSpeed = chasingSpeed;
         _attacker.enabled = true;
+        _rb.sharedMaterial = jumpMaterial2D;
         //点燃炸弹。
-        _bomb.Ignite();
+        StartCoroutine(IgniteBomb());
         //确定追击方向。
         if (TargetPos.x - transform.position.x < 0)
         {
@@ -96,6 +110,19 @@ public class BigGuy : Enemy
             _directionOfPursuit = 1;
         }
     }
+
+    /// <summary>
+    /// 用于实现敌人大块头发现玩家时，停顿一下，点燃炸弹，然后冲刺的效果。
+    /// </summary>
+    /// <returns></returns>
+    IEnumerator IgniteBomb()
+    {
+        CanMove = false;
+        yield return new WaitForSeconds(0.25f);
+        _bomb.Ignite(1.5f);
+        yield return new WaitForSeconds(0.25f);
+        CanMove = true;
+    }
     
     /// <summary>
     /// 退出发现目标的状态后，关闭攻击触发器，不再攻击。
@@ -105,7 +132,11 @@ public class BigGuy : Enemy
     /// </remarks>
     private void Relax()
     {
+        realSpeed = patrolSpeed;
+        _attacker.enabled = false;
         _bomb = null;
+        _rb.sharedMaterial = defaultMaterial2D;
+        _rb.velocity = Vector2.zero;
     }
 
     /// <summary>
@@ -116,7 +147,7 @@ public class BigGuy : Enemy
         //攻击时不能移动。
         if (CanMove)
         {
-            _rb.velocity = new Vector2(_directionOfPursuit * Speed, _rb.velocity.y);
+            _rb.velocity = new Vector2(_directionOfPursuit * realSpeed, _rb.velocity.y);
         }
     }
 }
