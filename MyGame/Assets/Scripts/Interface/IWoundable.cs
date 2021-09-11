@@ -1,3 +1,5 @@
+using UnityEngine;
+
 /// <summary>
 /// 可以被攻击受到伤害的对象应当实现此接口。
 /// </summary>
@@ -21,7 +23,7 @@ public interface IWoundable
     /// 受到伤害。
     /// </summary>
     /// <param name="damage">受到的伤害值。</param>
-    void GetHit(int damage);
+    void GetHit(int damage,Vector2? force = null);
     /// <summary>
     /// 死亡。
     /// </summary>

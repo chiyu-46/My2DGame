@@ -33,6 +33,16 @@ public class EnemyAttack : MonoBehaviour
     /// </summary>
     [SerializeField]
     protected int _attack;
+    /// <summary>
+    /// 敌人攻击目标时给予目标的作用力向量。
+    /// </summary>
+    [SerializeField]
+    protected float attackForce;
+    /// <summary>
+    /// 此敌人正前方的点。
+    /// </summary>
+    [SerializeField]
+    protected Transform frontPoint;
     
     protected static readonly int AttackToBomb = Animator.StringToHash("AttackToBomb");
     protected static readonly int AttackToPlayer = Animator.StringToHash("AttackToPlayer");

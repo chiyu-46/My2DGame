@@ -71,6 +71,38 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _attack: 0
+  attackForce: 0
+  frontPoint: {fileID: 1025940609728652459}
+--- !u!1 &1353427523736747057
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1025940609728652459}
+  m_Layer: 8
+  m_Name: FrontPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: -5442936267250999957, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1025940609728652459
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1353427523736747057}
+  m_LocalRotation: {x: -0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 6565170248314475516}
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &4525139141239013781
 GameObject:
   m_ObjectHideFlags: 0
@@ -207,6 +239,7 @@ Transform:
   - {fileID: 6899059492464554606}
   - {fileID: 4426509178669954983}
   - {fileID: 5550837000729535776}
+  - {fileID: 1025940609728652459}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -341,6 +374,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   health: 1
   defense: 0
+  antiInterruption: 0
   routeLayerMask:
     serializedVersion: 2
     m_Bits: 32768
@@ -350,6 +384,7 @@ MonoBehaviour:
   jumpMaterial2D: {fileID: 6200000, guid: 68b56ae134eebdb43ab0b9194d1dacdf, type: 2}
   PatrolIdleTime: 2
   LostIdleTime: 3
+  findToMoveTime: 0
   groundChecker: {fileID: 3435626955924077683}
   checkRadius: 0.2
   groundLayer:

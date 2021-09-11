@@ -131,6 +131,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _attack: 1
+  attackForce: 5
   forceOffKick: 7
   frontPoint: {fileID: 6388759782271980110}
 --- !u!1 &6643546358622940762
@@ -373,6 +374,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   health: 2
   defense: 0
+  antiInterruption: 0
   routeLayerMask:
     serializedVersion: 2
     m_Bits: 32768

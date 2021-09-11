@@ -12,7 +12,7 @@ public class WhaleAttack : EnemyAttack
             {
                 EnemyAnimator.SetTrigger(AttackToPlayer);
                 //TODO:在攻击时刻进行攻击，而不是直接判定进入攻击范围就受到攻击。
-                other.GetComponent<PlayerController>().GetHit(_attack);
+                other.GetComponent<PlayerController>().GetHit(_attack, ((Vector2)frontPoint.position - (Vector2)transform.position) * attackForce);
             }
             else if(other.CompareTag("Bomb") && other.GetComponent<Bomb>().State == Bomb.BombState.BombOn)
             {

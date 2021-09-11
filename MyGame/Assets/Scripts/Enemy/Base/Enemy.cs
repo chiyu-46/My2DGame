@@ -26,7 +26,16 @@ public class Enemy : BaseFSM, IWoundable
     public int Defense { get => defense; set => defense = value; }
     /// <inheritdoc />
     public bool CanGetHit { get; set; }
-
+    /// <summary>
+    /// 此变量用于确定此角色是否具有抗打断能力。如果此值为true，则此角色不受协程BouncedOffByAttack影响。
+    /// </summary>
+    [SerializeField]
+    protected bool antiInterruption;
+    /// <summary>
+    /// 此变量用于确定打断效果是否被覆盖。当此敌人处于影响是否移动的buff下时，此值为true，BouncedOffByAttack将不再恢复敌人行动能力。
+    /// </summary>
+    protected bool isOverrideInterruption;
+    
     #endregion
 
     #region 组件
@@ -532,10 +541,11 @@ public class Enemy : BaseFSM, IWoundable
     #region 受伤与死亡
     
     /// <inheritdoc />
-    public void GetHit(int damage)
+    public void GetHit(int damage,Vector2? force = null)
     {
         if (CanGetHit)
         {
+            StartCoroutine(BouncedOffByAttack(force ?? Vector2.zero));
             //如果防御力大于受到伤害，则不受伤害。
             int real = damage - Defense;
             if (real <= 0)
@@ -556,6 +566,26 @@ public class Enemy : BaseFSM, IWoundable
         }
     }
 
+    /// <summary>
+    /// 用于实现游戏对象被攻击时受力弹开的效果的协程。如果此敌人拥有抗打断能力，则不受影响。
+    /// </summary>
+    /// <param name="force">游戏对象受到的作用力。</param>
+    IEnumerator BouncedOffByAttack(Vector2 force)
+    {
+        if (antiInterruption)
+        {
+            yield break;
+        }
+        CanMove = false;
+        _rb.velocity = Vector2.zero;
+        _rb.AddForce(force,ForceMode2D.Impulse);
+        yield return new WaitForSeconds(.5f);
+        if (!isOverrideInterruption)
+        {
+            CanMove = true;
+        }
+    }
+    
     /// <summary>
     /// 播放受伤动画。保持在受伤状态时执行。
     /// </summary>
@@ -593,6 +623,7 @@ public class Enemy : BaseFSM, IWoundable
     public void Dead()
     {
         EnemyAnimator.SetTrigger(DeadId);
+        isOverrideInterruption = true;
     }
     
     #endregion

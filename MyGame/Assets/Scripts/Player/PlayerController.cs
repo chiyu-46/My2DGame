@@ -50,6 +50,15 @@ public class PlayerController : MonoBehaviour, IWoundable
     /// Player是否已经死了。
     /// </summary>
     public bool IsDead { get => _isDead; }
+    /// <summary>
+    /// 此变量用于确定此角色是否具有抗打断能力。如果此值为true，则此角色不受协程BouncedOffByAttack影响。
+    /// </summary>
+    [SerializeField]
+    private bool antiInterruption;
+    /// <summary>
+    /// 此变量用于确定打断效果是否被覆盖。当此角色处于影响是否移动的buff下时，此值为true，BouncedOffByAttack将不再恢复敌人行动能力。
+    /// </summary>
+    private bool isOverrideInterruption;
     
     /// <summary>
     /// Player的刚体组件。
@@ -80,6 +89,16 @@ public class PlayerController : MonoBehaviour, IWoundable
     /// Player的速度，缓慢加减速由Unity输入轴实现。
     /// </summary>
     public float speed;
+    /// <summary>
+    /// 默认物理材质。
+    /// </summary>
+    [SerializeField]
+    protected PhysicsMaterial2D defaultMaterial2D;
+    /// <summary>
+    /// 跳跃时使用的物理材质。
+    /// </summary>
+    [SerializeField]
+    protected PhysicsMaterial2D jumpMaterial2D;
     /// <summary>
     /// 动画控制参数Dead的id值。
     /// </summary>
@@ -141,6 +160,7 @@ public class PlayerController : MonoBehaviour, IWoundable
     {
         //获取刚体组件。
         _rb = GetComponent<Rigidbody2D>();
+        _rb.sharedMaterial = defaultMaterial2D;
         //获取动画器组件。
         _animator = GetComponent<Animator>();
         //获取PlayerInput组件。
@@ -229,18 +249,21 @@ public class PlayerController : MonoBehaviour, IWoundable
         if (_isGround)
         {
             _rb.gravityScale = 1;
+            _rb.sharedMaterial = defaultMaterial2D;
         }
         else
         {
             _rb.gravityScale = 4;
+            _rb.sharedMaterial = jumpMaterial2D;
         }
     }
 
     /// <inheritdoc />
-    public void GetHit(int damage)
+    public void GetHit(int damage, Vector2? force = null)
     {
         if (CanGetHit)
         {
+            StartCoroutine(BouncedOffByAttack(force ?? Vector2.zero));
             //如果防御力大于受到伤害，则不受伤害。
             int real = damage - Defense;
             if (real <= 0)
@@ -263,6 +286,27 @@ public class PlayerController : MonoBehaviour, IWoundable
     }
 
     /// <summary>
+    /// 用于实现游戏对象被攻击时受力弹开的效果的协程。如果此敌人拥有抗打断能力，则不受影响。
+    /// </summary>
+    /// <param name="force">游戏对象受到的作用力。</param>
+    IEnumerator BouncedOffByAttack(Vector2 force)
+    {
+        if (antiInterruption)
+        {
+            yield break;
+        }
+        canMove = false;
+        _rb.velocity = Vector2.zero;
+        _rb.AddForce(force,ForceMode2D.Impulse);
+        yield return new WaitForSeconds(.5f);
+        if (!isOverrideInterruption)
+        {
+            canMove = true;
+        }
+        
+    }
+    
+    /// <summary>
     /// 受伤动画播放完成，可以接受下一次攻击。动画系统调用。
     /// </summary>
     public void GetHitAnimationFinished()
@@ -275,6 +319,7 @@ public class PlayerController : MonoBehaviour, IWoundable
     {
         _animator.SetTrigger(DeadId);
         canMove = false;
+        isOverrideInterruption = true;
         CanGetHit = false;
         _isDead = true;
     }

@@ -149,7 +149,7 @@ BoxCollider2D:
   m_GameObject: {fileID: 4534596171405235397}
   m_Enabled: 1
   m_Density: 1
-  m_Material: {fileID: 6200000, guid: 68b56ae134eebdb43ab0b9194d1dacdf, type: 2}
+  m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
@@ -300,10 +300,13 @@ MonoBehaviour:
   health: 3
   defense: 0
   maxHealth: 3
+  antiInterruption: 0
   jumpForce: 5
   speed: 4
+  defaultMaterial2D: {fileID: 6200000, guid: 1ace03d1fd7271b48b1696ab2620d0d4, type: 2}
+  jumpMaterial2D: {fileID: 6200000, guid: 68b56ae134eebdb43ab0b9194d1dacdf, type: 2}
   groundChecker: {fileID: 4534596170629330896}
-  checkRadius: 0.4
+  checkRadius: 0.1
   groundLayer:
     serializedVersion: 2
     m_Bits: 64

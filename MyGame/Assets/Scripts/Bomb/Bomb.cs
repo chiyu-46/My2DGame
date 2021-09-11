@@ -147,18 +147,22 @@ public class Bomb : MonoBehaviour, IPoolAble
         foreach (var item in aroundObjects)
         {
             Vector3 forceDirection = item.transform.position - transform.position;
-            item.GetComponent<Rigidbody2D>().AddForce(forceDirection * bombForce,ForceMode2D.Impulse);
             if (item.GetComponent<PlayerController>())
             {
-                item.GetComponent<PlayerController>().GetHit(attack);
+                item.GetComponent<PlayerController>().GetHit(attack,forceDirection * bombForce);
             }
             else if (item.GetComponent<Enemy>())
             {
-                item.GetComponent<Enemy>().GetHit(attack);
+                item.GetComponent<Enemy>().GetHit(attack,forceDirection * bombForce);
             }
             else if (item.GetComponent<Bomb>())
             {
                 item.GetComponent<Bomb>().Ignite();
+                item.GetComponent<Rigidbody2D>().AddForce(forceDirection * bombForce,ForceMode2D.Impulse);
+            }
+            else
+            {
+                item.GetComponent<Rigidbody2D>().AddForce(forceDirection * bombForce,ForceMode2D.Impulse);
             }
         }
     }
