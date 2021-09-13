@@ -42,9 +42,20 @@ public class PlayerController : MonoBehaviour, IWoundable
     /// Player是否已经死了。
     /// </summary>
     private bool _isDead;
-    /// <inheritdoc />
-    public int Health { get => health; set { health = value > maxHealth ? maxHealth : value; } }
-    /// <inheritdoc />
+    
+    public int Health 
+    { 
+        get => health; 
+        set 
+        { 
+            health = value > maxHealth ? maxHealth : value; 
+            if (!(gameManager is null)) 
+            { 
+                gameManager.UpdateHealthPoint(health); 
+            }
+        } 
+    }
+    
     public int Defense { get => defense; set => defense = value; }
     /// <summary>
     /// Player是否已经死了。
@@ -72,6 +83,10 @@ public class PlayerController : MonoBehaviour, IWoundable
     /// Player的PlayerInput组件。
     /// </summary>
     private PlayerInput _playerInput;
+    /// <summary>
+    /// 游戏控制器对象。
+    /// </summary>
+    private GameManager gameManager;
     /// <summary>
     /// Player在输入系统中用于控制移动的InputAction。
     /// </summary>
@@ -158,6 +173,7 @@ public class PlayerController : MonoBehaviour, IWoundable
     
     void Start()
     {
+        StartCoroutine(GetGameManager());
         //获取刚体组件。
         _rb = GetComponent<Rigidbody2D>();
         _rb.sharedMaterial = defaultMaterial2D;
@@ -273,6 +289,10 @@ public class PlayerController : MonoBehaviour, IWoundable
             //受到伤害。
             CanGetHit = false;
             Health = Health - real;
+            if (!(gameManager is null))
+            {
+                gameManager.UpdateHealthPoint(health);
+            }
             //如果此次受伤导致死亡，将不播放受伤动画，直接死亡。
             if (Health <= 0)
             {
@@ -403,6 +423,27 @@ public class PlayerController : MonoBehaviour, IWoundable
         canMove = true;
         _rb.isKinematic = false;
         currentUseDoorState = (int)UseDoorState.UnUseDoor;
+    }
+
+    /// <summary>
+    /// 获取GameManager的引用并注册自己。
+    /// </summary>
+    private IEnumerator GetGameManager()
+    {
+        while (true)
+        {
+            if (gameManager is null && !(GameObject.Find("GameManager") is null))
+            {
+                gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
+                if (!(gameManager is null))
+                {
+                    gameManager.Register(gameObject);
+                    gameManager.UpdateHealthPoint(health);
+                    yield break;
+                }
+            }
+            yield return null;
+        }
     }
 }
 

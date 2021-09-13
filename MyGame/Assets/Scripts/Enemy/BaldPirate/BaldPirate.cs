@@ -14,9 +14,9 @@ public class BaldPirate : Enemy
     public override void Awake()
     {
         base.Awake();
-        Preference = "Player";
+        preference = "Player";
         //设置此敌人的首选目标。
-        Vision.Preference = Preference;
+        vision.Preference = preference;
         //添加状态。
         AllStates.Add("FindTarget",new FSMState("FindTarget"));
         //添加每个状态要执行的内容。
@@ -29,12 +29,12 @@ public class BaldPirate : Enemy
         List<FSMTranslation> tempStateTranslations;
         //巡逻状态转换到找到目标。
         tempStateTranslations = AllStates["Patrol"].FsmTranslations;
-        tempStateTranslations.Add(new FSMTranslation("FindTarget",() => _findTarget));
+        tempStateTranslations.Add(new FSMTranslation("FindTarget",() => isFindTarget));
         //找到目标状态中受伤转换到受伤状态。
         tempStateTranslations = AllStates["FindTarget"].FsmTranslations;
-        tempStateTranslations.Add(new FSMTranslation("GitHit",() => _getHit));
+        tempStateTranslations.Add(new FSMTranslation("GitHit",() => isGetHit));
         //找到目标状态转换到巡逻状态。
-        tempStateTranslations.Add(new FSMTranslation("Patrol",() => !_findTarget));
+        tempStateTranslations.Add(new FSMTranslation("Patrol",() => !isFindTarget));
     }
 
     /// <summary>
@@ -43,8 +43,8 @@ public class BaldPirate : Enemy
     private void GetReady()
     {
         realSpeed = chasingSpeed;
-        _attacker.enabled = true;
-        _rb.sharedMaterial = jumpMaterial2D;
+        attacker.enabled = true;
+        rb.sharedMaterial = jumpMaterial2D;
         StartCoroutine(WaitForStartMove());
     }
     
@@ -57,9 +57,9 @@ public class BaldPirate : Enemy
     private void Relax()
     {
         realSpeed = patrolSpeed;
-        _attacker.enabled = false;
-        Vision.GetComponent<Collider2D>().enabled = true;
-        _rb.sharedMaterial = defaultMaterial2D;
+        attacker.enabled = false;
+        vision.GetComponent<Collider2D>().enabled = true;
+        rb.sharedMaterial = defaultMaterial2D;
     }
 
     /// <summary>
@@ -68,57 +68,57 @@ public class BaldPirate : Enemy
     private void MoveToTarget()
     {
         //如果正在跳跃，将只执行此if。
-        if (IsJumping)
+        if (isJumping)
         {
-            if (JumpEnd)
+            if (isJumpEnd)
             {
-                JumpEnd = false;
-                IsJumping = false;
-                Vision.GetComponent<Collider2D>().enabled = true;
-                Vision.ReportTargetPos();
+                isJumpEnd = false;
+                isJumping = false;
+                vision.GetComponent<Collider2D>().enabled = true;
+                vision.ReportTargetPos();
             }
-            _rb.velocity = new Vector2(JumpDirection * realSpeed, _rb.velocity.y);
+            rb.velocity = new Vector2(jumpDirection * realSpeed, rb.velocity.y);
             return;
         }
         //攻击时不能移动。
-        if (CanMove)
+        if (canMove)
         {
             //如果目标在极限时间，无法达到，强制更新目标位置。
-            if (Time.time - GetTargetTime > PrescribedTime)
+            if (Time.time - getTargetTime > prescribedTime)
             {
-                Vision.ReportTargetPos();
+                vision.ReportTargetPos();
             }
-            if (TargetPos.x - transform.position.x > 0.1)
+            if (targetPos.x - transform.position.x > 0.1)
             {
                 //向右追
-                _rb.velocity = new Vector2(realSpeed, _rb.velocity.y);
+                rb.velocity = new Vector2(realSpeed, rb.velocity.y);
             }
-            else if(TargetPos.x - transform.position.x < -0.1)
+            else if(targetPos.x - transform.position.x < -0.1)
             {
                 //向左追
-                _rb.velocity = new Vector2(-realSpeed, _rb.velocity.y);
+                rb.velocity = new Vector2(-realSpeed, rb.velocity.y);
             }
             else
             {
-                if (ShouldJump)
+                if (isShouldJump)
                 {
-                    if (_rb.velocity.x > 0)
+                    if (rb.velocity.x > 0)
                     {
-                        JumpDirection = 1;
+                        jumpDirection = 1;
                     }
                     else
                     {
-                        JumpDirection = -1;
+                        jumpDirection = -1;
                     }
-                    ShouldJump = false;
-                    _rb.AddForce(JumpForceVector,ForceMode2D.Impulse);
-                    EnemyAnimator.SetTrigger(StartJump);
-                    IsJumping = true;
-                    Vision.GetComponent<Collider2D>().enabled = false;
+                    isShouldJump = false;
+                    rb.AddForce(jumpForceVector,ForceMode2D.Impulse);
+                    enemyAnimator.SetTrigger(startJump);
+                    isJumping = true;
+                    vision.GetComponent<Collider2D>().enabled = false;
                     return;
                 }
                 //到达目标位置，获取下一个目标位置。
-                Vision.ReportTargetPos();
+                vision.ReportTargetPos();
             }
         }
     }

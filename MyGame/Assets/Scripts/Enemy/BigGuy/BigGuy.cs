@@ -42,9 +42,9 @@ public class BigGuy : Enemy
     {
         base.Awake();
         _fixedJoint = transform.GetChild(3).GetComponent<FixedJoint2D>();
-        Preference = "Player";
+        preference = "Player";
         //设置此敌人的首选目标。
-        Vision.Preference = Preference;
+        vision.Preference = preference;
         //添加状态。
         AllStates.Add("FindTarget",new FSMState("FindTarget"));
         //添加每个状态要执行的内容。
@@ -57,10 +57,10 @@ public class BigGuy : Enemy
         List<FSMTranslation> tempStateTranslations;
         //巡逻状态转换到找到目标。
         tempStateTranslations = AllStates["Patrol"].FsmTranslations;
-        tempStateTranslations.Add(new FSMTranslation("FindTarget",() => IsPreferred));
+        tempStateTranslations.Add(new FSMTranslation("FindTarget",() => isPreferred));
         //找到目标状态中受伤转换到受伤状态。因为基础类中，只有受伤状态能进入死亡状态。此类敌人一击必杀，而且出击后必死，不需要返回巡逻状态。
         tempStateTranslations = AllStates["FindTarget"].FsmTranslations;
-        tempStateTranslations.Add(new FSMTranslation("GitHit",() => _getHit));
+        tempStateTranslations.Add(new FSMTranslation("GitHit",() => isGetHit));
     }
 
     private void Start()
@@ -96,12 +96,12 @@ public class BigGuy : Enemy
     private void GetReady()
     {
         realSpeed = chasingSpeed;
-        _attacker.enabled = true;
-        _rb.sharedMaterial = jumpMaterial2D;
+        attacker.enabled = true;
+        rb.sharedMaterial = jumpMaterial2D;
         //点燃炸弹。
         StartCoroutine(IgniteBomb());
         //确定追击方向。
-        if (TargetPos.x - transform.position.x < 0)
+        if (targetPos.x - transform.position.x < 0)
         {
             _directionOfPursuit = -1;
         }
@@ -117,11 +117,11 @@ public class BigGuy : Enemy
     /// <returns></returns>
     IEnumerator IgniteBomb()
     {
-        CanMove = false;
+        canMove = false;
         yield return new WaitForSeconds(0.25f);
         _bomb.Ignite(1.5f);
         yield return new WaitForSeconds(0.25f);
-        CanMove = true;
+        canMove = true;
     }
     
     /// <summary>
@@ -133,10 +133,10 @@ public class BigGuy : Enemy
     private void Relax()
     {
         realSpeed = patrolSpeed;
-        _attacker.enabled = false;
+        attacker.enabled = false;
         _bomb = null;
-        _rb.sharedMaterial = defaultMaterial2D;
-        _rb.velocity = Vector2.zero;
+        rb.sharedMaterial = defaultMaterial2D;
+        rb.velocity = Vector2.zero;
     }
 
     /// <summary>
@@ -145,9 +145,9 @@ public class BigGuy : Enemy
     private void MoveToTarget()
     {
         //攻击时不能移动。
-        if (CanMove)
+        if (canMove)
         {
-            _rb.velocity = new Vector2(_directionOfPursuit * realSpeed, _rb.velocity.y);
+            rb.velocity = new Vector2(_directionOfPursuit * realSpeed, rb.velocity.y);
         }
     }
 }
