@@ -61,6 +61,22 @@ public class GameManager : MonoBehaviour
     }
 
     /// <summary>
+    /// 如果生命值UI组件注册时间晚于需要调用它的时间，将使用此协程记录请求信息。
+    /// </summary>
+    /// <param name="value">当前生命值。</param>
+    private IEnumerator WaitForHealthBar(int value)
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(.25f);
+            if (UpdateHealthPoint(value) == 0)
+            {
+                yield break;
+            }
+        }
+    }
+    
+    /// <summary>
     /// 作为Player与生命值UI中介的函数。
     /// </summary>
     /// <param name="value">当前生命值。</param>
@@ -85,22 +101,6 @@ public class GameManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 如果生命值UI组件注册时间晚于需要调用它的时间，将使用此协程记录请求信息。
-    /// </summary>
-    /// <param name="value">当前生命值。</param>
-    private IEnumerator WaitForHealthBar(int value)
-    {
-        while (true)
-        {
-            yield return new WaitForSeconds(.25f);
-            if (UpdateHealthPoint(value) == 0)
-            {
-                yield break;
-            }
-        }
-    }
-    
-    /// <summary>
     /// 需要主动注册的对象的注册入口。
     /// </summary>
     /// <param name="registrant">注册者自己。</param>
@@ -121,4 +121,16 @@ public class GameManager : MonoBehaviour
     {
         
     }
+
+    public void Save()
+    {
+        
+    }
+    
+    
+    public void Load()
+    {
+        
+    }
+    
 }
