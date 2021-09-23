@@ -11,6 +11,7 @@ using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
 using Unity.Collections.LowLevel.Unsafe;
+using Helper;
 
 
 /// <summary>
@@ -767,4 +768,55 @@ public class Test : MonoBehaviour
     // }
 
     #endregion
+
+    #region 测试存档功能\测试多线程帮助类
+
+    // /**
+    //  * 测试单线程存档功能。
+    //  * 完美运行。
+    //  */
+    // private void Start()
+    // {
+    //     FileSystem.Initialize();
+    //     PlayerArchive playerArchive = ScriptableObject.CreateInstance<PlayerArchive>();
+    //     playerArchive.CurrentLevelNumber++;
+    //     SaveSystem.Save(playerArchive,FileSystem.UsedFilePath.PlayerArchive);
+    //     SaveSystem.Load(out playerArchive,FileSystem.UsedFilePath.PlayerArchive);
+    //     Debug.Log(playerArchive.CurrentLevelNumber);
+    // }
+
+    
+    
+    // /**
+    //  * 测试以多线程进行存档。
+    //  * 测试通过。
+    //  */
+    // private void Start()
+    // {
+    //     FileSystem.Initialize();
+    //     PlayerArchive playerArchive = ScriptableObject.CreateInstance<PlayerArchive>();
+    //     playerArchive.CurrentLevelNumber++;
+    //     SaveHelper saveHelper = new SaveHelper(playerArchive, FileSystem.UsedFilePath.PlayerArchive);
+    //     Thread saveTask = new Thread(saveHelper.ThreadProc);
+    //     saveTask.Start();
+    //     // SaveSystem.Save(playerArchive,FileSystem.UsedFilePath.PlayerArchive);
+    //     saveTask.Join();
+    //     LoadHelper loadHelper = new LoadHelper(playerArchive, FileSystem.UsedFilePath.PlayerArchive);
+    //     Thread loadThread = new Thread(loadHelper.ThreadProc);
+    //     loadThread.Start();
+    //     // SaveSystem.Load(out playerArchive,FileSystem.UsedFilePath.PlayerArchive);
+    //     loadThread.Join();
+    //     playerArchive = loadHelper.So;
+    //     Debug.Log(playerArchive.CurrentLevelNumber);
+    // }
+    
+    #endregion
+
+    #region 测试多线程帮助类
+
+    
+
+    #endregion
+    
+    
 }

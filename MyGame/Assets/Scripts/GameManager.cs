@@ -10,6 +10,11 @@ public class GameManager : MonoBehaviour
     /// </summary>
     private UIManager uiManager;
     /// <summary>
+    /// 玩家存档脚本化对象。
+    /// </summary>
+    private PlayerArchive playerArchive;
+    
+    /// <summary>
     /// 所有需要由GameManager主动获取的对象的数量。
     /// </summary>
     private int allNeedGetNum = 1;
@@ -28,6 +33,15 @@ public class GameManager : MonoBehaviour
     /// </summary>
     private bool isWaitForHealthBar;
     
+
+    private void Awake()
+    {
+        //在主线程中显式初始化文件系统。
+        FileSystem.Initialize();
+        //生成脚本化对象只能在主线程中完成。
+        playerArchive = ScriptableObject.CreateInstance<PlayerArchive>();
+    }
+
     private void Start()
     {
         StartCoroutine(GetRequirementItems());
